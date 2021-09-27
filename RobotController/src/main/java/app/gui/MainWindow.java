@@ -1,15 +1,67 @@
 package app.gui;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-public class MainWindow {
-    int windowWidth = 100;
-    int windowHeight = 200;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Image;
+import java.awt.Toolkit;
+
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.net.URL;
+public class MainWindow{
+    int windowWidth = 600;
+    int windowHeight = 600;
     public void display(){
+        ImageIcon img = new ImageIcon("C:\\Users\\David Zaha\\Documents\\GitHub\\RobotExternalSoftware\\RobotController\\resources\\deepSpace.jpeg");
+        
+        Page page = new Page();
         JFrame frame = new JFrame();
         frame.setTitle("Robot Controller");
-        frame.setVisible(true);
+        frame.add(page);
+        frame.setSize(page.getPreferredSize());
+        
+       
+       
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(windowWidth, windowHeight);
+     
+        frame.setVisible(true);
+    }
+}
+class Page extends JPanel{
+    BufferedImage img;
+    BufferedImage robot;
+    int STARTX = 350;
+    int STARTY = 100;
+    public Page(){
+        try{
+        img = ImageIO.read(new File("C:\\Users\\David Zaha\\Documents\\GitHub\\RobotExternalSoftware\\RobotController\\resources\\deepSpace.jpeg"));
+        }
+           catch(Exception e){
+            System.out.print("can't find image");
+        }
+        robot = new BufferedImage(50,50, BufferedImage.TYPE_3BYTE_BGR);
+       
+        }
+    @Override
+    public Dimension getPreferredSize() {
+       return new Dimension(img.getWidth(), img.getHeight());
+    }
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        
+        g.drawImage(img, 0, 0, this);
+        g.drawImage(robot,STARTX,STARTY,this);
     }
 }
