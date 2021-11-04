@@ -26,7 +26,7 @@ import java.net.URL;
 public class MainWindow{
     int windowWidth = 600;
     int windowHeight = 600;
-    public static String currentPath = Paths.get("").toAbsolutePath().getParent().getParent().getParent().getParent().toString();
+    public static String currentPath = Paths.get("").toAbsolutePath().toString();
     public static String fs = File.separator;
     public void display(){
         ImageIcon img = new ImageIcon(currentPath + fs + "resources"+ fs +"deepSpace.jpeg");
@@ -48,6 +48,7 @@ class Page extends JPanel{
     int STARTY = 100;
     public Page() {
         try{
+            System.out.println(MainWindow.currentPath);
             img = ImageIO.read(new File(MainWindow.currentPath + MainWindow.fs + "resources" + MainWindow.fs + "deepSpace.jpeg"));
         } catch(IOException e) {
             System.out.print("can't find image");
