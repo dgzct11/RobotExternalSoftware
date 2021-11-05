@@ -10,7 +10,7 @@ public class Main {
         System.out.println("Hello world!");
         MainWindow window = new MainWindow();
         window.display();
-        NetClient netClient = new NetClient();
-        netClient.run();
+        /*NetClient netClient = new NetClient();
+        netClient.run();*/
     }
 }
