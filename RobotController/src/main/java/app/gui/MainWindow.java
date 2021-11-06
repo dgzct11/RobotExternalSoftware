@@ -1,91 +1,78 @@
 package app.gui;
 
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
-import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import app.gui.WindowMan.IntLabel;
+import app.gui.WindowMan.Page;
+
 public class MainWindow {
-
-    public static String currentPath = Paths.get("").toAbsolutePath().toString();
-    public static String fs = File.separator;
-
+    
     public void display() throws IOException {
 
-        Page page = new Page();
-        page.setLayout( new BoxLayout(page, BoxLayout.Y_AXIS));
+        //Create the page
+        Page page = new Page(BoxLayout.Y_AXIS);
 
-        JTextArea jta = new JTextArea("help") {
-            public Dimension getMaximumSize()
-            {
-                Dimension d = super.getMaximumSize();
-                d.height = getPreferredSize().height;
-                d.width = getPreferredSize().width;
-                return d;
-            }
-        };
-        jta.setAlignmentX(Component.CENTER_ALIGNMENT);
+        //Panel 1
+        JPanel pan1 = WindowMan.addPanel(Component.CENTER_ALIGNMENT, BoxLayout.X_AXIS);
+        JButton b1 = WindowMan.addButton("Button 1", pan1);
+        JTextArea jta1 = WindowMan.addTA("help", pan1);
+        JButton b6 = WindowMan.addButton("Button 1", pan1);
+        JTextArea jta6 = WindowMan.addTA("help", pan1);
+        JButton b7 = WindowMan.addButton("Button 1", pan1);
+        JTextArea jta7 = WindowMan.addTA("help", pan1);
+        JButton b8 = WindowMan.addButton("Button 1", pan1);
+        JTextArea jta8 = WindowMan.addTA("help", pan1);
+        JButton b9 = WindowMan.addButton("Button 1", pan1);
+        JTextArea jta9 = WindowMan.addTA("help", pan1);
 
-        JButton b1 = addButton("Button 1", page);
-        addButton("Button 2", page);
-        addButton("Button 3", page);
-        addButton("Long-Named Button 4", page);
-        addButton("5", page);
-        page.add(jta);
+        //Panel 2
+        JPanel pan2 = WindowMan.addPanel(Component.LEFT_ALIGNMENT, BoxLayout.Y_AXIS);
+        JButton b2 = WindowMan.addButton("Button 1", pan2);
+        JTextArea jta2 = WindowMan.addTA("help", pan2);
+        JButton b3 = WindowMan.addButton("Button 1", pan2);
+        JTextArea jta3 = WindowMan.addTA("help", pan2);
 
-        b1.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e) {jta.setText("tu mama");}});
-        JFrame frame = new JFrame();
+        //Panel 3
+        JPanel pan3 = WindowMan.addPanel(Component.CENTER_ALIGNMENT, BoxLayout.Y_AXIS);
+        JLabel label = new IntLabel();
+        pan3.setBackground(Color.BLACK);
+        pan3.add(label);
 
-        JScrollPane sPane = new JScrollPane();
-        sPane.setViewportView(page);
+        //Panel 4
+        JPanel pan4 = WindowMan.addPanel(Component.RIGHT_ALIGNMENT, BoxLayout.Y_AXIS);
+        JButton b4 = WindowMan.addButton("Button 1", pan4);
+        JTextArea jta4 = WindowMan.addTA("help", pan4);
+        JButton b5 = WindowMan.addButton("Button 1", pan4);
+        JTextArea jta5 = WindowMan.addTA("help", pan4);
+        
+        //Panel 5, the holding panel
+        JPanel pan5 = WindowMan.addPanel(Component.CENTER_ALIGNMENT, BoxLayout.X_AXIS);
 
-        frame.setTitle("Robot Controller");
-        frame.add(sPane);
-        frame.setSize(page.getPreferredSize());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
-    }
-    
-    private static JButton addButton(String text, Container container) {
-        JButton button = new JButton(text);
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        container.add(button);
-        return button;
+        //Add panels to page
+        page.add(pan1);
+        pan5.add(pan2);
+        pan5.add(pan3);
+        pan5.add(pan4);
+        page.add(pan5);
+
+        //Button functions
+        b2.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e) {jta2.setText("tu mama");}});
+        b3.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e) {jta3.setText("tu mama");}});
+        b4.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e) {jta4.setText("tu mama");}});
+        b5.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e) {jta5.setText("tu mama");}});
+
+        //Make the frame to display everything
+        JFrame frame = WindowMan.addFrame("Robot Control", page);
     }
 }
-
-class Page extends JPanel {
-    private static final long serialVersionUID = 1L;
-
-    BufferedImage img;
-
-    public Page() throws IOException {
-        img = ImageIO.read(new File(MainWindow.currentPath + MainWindow.fs + "resources" + MainWindow.fs + "deepSpace.jpeg"));
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-       return new Dimension(img.getWidth(), img.getHeight());
-    }
-    
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.drawImage(img, 0, 0, this);
-    }
-}   
