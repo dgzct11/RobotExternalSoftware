@@ -13,7 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import app.gui.WindowMan.IntLabel;
+import app.gui.WindowMan.IntPanel;
 import app.gui.WindowMan.Page;
 
 public class MainWindow {
@@ -44,10 +44,7 @@ public class MainWindow {
         JTextArea jta3 = WindowMan.addTA("help", pan2);
 
         //Panel 3
-        JPanel pan3 = WindowMan.addPanel(Component.CENTER_ALIGNMENT, BoxLayout.Y_AXIS);
-        JLabel label = new IntLabel();
-        pan3.setBackground(Color.BLACK);
-        pan3.add(label);
+        IntPanel pan3 = new IntPanel();
 
         //Panel 4
         JPanel pan4 = WindowMan.addPanel(Component.RIGHT_ALIGNMENT, BoxLayout.Y_AXIS);

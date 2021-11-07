@@ -7,20 +7,23 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.io.File;
-import java.io.IOException;
 
 public class WindowMan {
     public static String currentPath = Paths.get("").toAbsolutePath().toString();
@@ -58,13 +61,12 @@ public class WindowMan {
     }
 
     public static JFrame addFrame(String text, JPanel page) {
-        JFrame frame = new JFrame();
-        frame.setTitle(text);
-        frame.setContentPane(page);
-        frame.setSize(page.getPreferredSize());
+        JFrame frame = new JFrame(text);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(false);  
+        frame.setContentPane(page);
+        frame.setResizable(false);
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         return frame;
     }
@@ -89,19 +91,67 @@ public class WindowMan {
             g.drawImage(img, 0, 0, this);
         }
     }
-    public static class IntLabel extends JLabel {
+    public static class IntPanel extends JPanel {
         private static final long serialVersionUID = 1L;
 
-        public static ArrayList<ArrayList<Integer>> a = new ArrayList<ArrayList<Integer>>();
-        public static ArrayList<Integer> b = new ArrayList<Integer>();
+        private MouseHandler mouseHandler = new MouseHandler();
+        private ArrayList<Point[]> points = new ArrayList<Point[]>();
+        private Point p1 = new Point(0, 0);
+        private Point p2 = new Point(0, 0);
+        private boolean drawing;
+
+        public IntPanel() {
+            this.setBackground(Color.BLACK);
+            this.addMouseListener(mouseHandler);
+            this.addMouseMotionListener(mouseHandler);
+        }
 
         @Override
-        public void paint(Graphics g) {
-            super.paint(g);
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
-            g2.setStroke(new BasicStroke(5f));
             g2.setColor(Color.GREEN);
+            g2.setRenderingHint(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setStroke(new BasicStroke(5,
+                BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
+            for (int i = 0; i < points.size(); i++) {
+                Line2D line = new Line2D.Float(points.get(i)[0], points.get(i)[1]);
+                g2.draw(line);
+            }
+
+            Line2D linew = new Line2D.Float(p1, p2);
+            g2.draw(linew);
         }
+
+        private class MouseHandler extends MouseAdapter {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                drawing = true;
+                p1 = e.getPoint();
+                p2 = p1;
+                repaint();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                drawing = false;
+                p2 = e.getPoint();
+                points.add(new Point[] {p1,p2});
+                repaint();
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (drawing) {
+                    p2 = e.getPoint();
+                    repaint();
+                }
+            }
+        }
+
         @Override
         public Dimension getMaximumSize()
         {
