@@ -64,19 +64,23 @@ public class WindowMan {
         JFrame frame = new JFrame(text);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setContentPane(page);
-        frame.setResizable(false);
+        frame.setResizable(true);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         return frame;
     }
+
+    //___________________________________________________________________________________________________
+
+
     public static class Page extends JPanel {
         private static final long serialVersionUID = 1L;
     
         BufferedImage img;
     
         public Page(int layout) throws IOException {
-            img = ImageIO.read(new File(currentPath + fs + "resources" + fs + "deepSpace.jpeg"));
+            img = ImageIO.read(new File("./RobotController"+ fs + "resources" + fs + "deepSpace.jpeg"));
             this.setLayout(new BoxLayout(this, layout));
         }
     
@@ -91,6 +95,9 @@ public class WindowMan {
             g.drawImage(img, 0, 0, this);
         }
     }
+
+    //_______________________________________________________________________________________________
+
     public static class IntPanel extends JPanel {
         private static final long serialVersionUID = 1L;
 
@@ -125,6 +132,8 @@ public class WindowMan {
             g2.draw(linew);
         }
 
+        // _______________________________________________________________________________
+        
         private class MouseHandler extends MouseAdapter {
 
             @Override
