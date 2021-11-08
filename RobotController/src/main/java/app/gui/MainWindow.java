@@ -21,7 +21,7 @@ public class MainWindow {
     public void display() throws IOException {
 
         //Create the page
-        Page page = new Page(BoxLayout.Y_AXIS);
+        Page page = new Page(BoxLayout.X_AXIS);
 
         //Panel 1
         JPanel pan1 = WindowMan.addPanel(Component.CENTER_ALIGNMENT, BoxLayout.X_AXIS);

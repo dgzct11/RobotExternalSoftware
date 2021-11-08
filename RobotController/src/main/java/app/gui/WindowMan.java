@@ -31,7 +31,7 @@ public class WindowMan {
 
     public static JTextArea addTA(String text, Container container) {
         JTextArea textarea = new JTextArea(text) {
-            private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
             public Dimension getMaximumSize()
             {
@@ -41,7 +41,7 @@ public class WindowMan {
                 return d;
             }
         };
-        textarea.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textarea.setAlignmentX(Component.RIGHT_ALIGNMENT);
         container.add(textarea);
         return textarea;
     }
