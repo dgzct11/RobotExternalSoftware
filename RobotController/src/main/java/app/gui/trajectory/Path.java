@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 /** Add your docs here. */
 public class Path {
-    double[][] points;
-    double[] distances;
+    public double[][] points;
+    public double[] distances;
     public ArrayList<Segment> segments;
     public double totalDistance = 0;
     public int currentIndex = 0;

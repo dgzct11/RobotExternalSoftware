@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.awt.Image;
 import javax.swing.JFrame;
@@ -22,16 +23,18 @@ import app.gui.trajectory.Path;
 import app.gui.trajectory.Segment;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.Graphics2D;
-public class TrajectoryPlanning extends JFrame{
+public class TrajectoryPlanning extends JFrame implements ActionListener{
     JFrame frame;
+    Panel panel;
     JMenuItem savePathToFile = new JMenuItem("Save Path");
     public void display(){
         frame = new JFrame();
         frame.setTitle("Trajectory Planning");
        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Panel panel = new Panel("./RobotController\\resources\\deepSpace.jpeg");
+        panel = new Panel("./RobotController\\resources\\deepSpace.jpeg");
         frame.add(panel);
 
         
@@ -45,6 +48,8 @@ public class TrajectoryPlanning extends JFrame{
         JMenuBar menuBar = new JMenuBar();
         JMenu menuActions = new JMenu("Actions");
         menuActions.add(savePathToFile);
+        savePathToFile.addActionListener(this);
+
         menuBar.add(menuActions);
 
         frame.setJMenuBar(menuBar);
@@ -54,12 +59,35 @@ public class TrajectoryPlanning extends JFrame{
         frame.setVisible(true);
     }
     public void actionPerformed(ActionEvent e){
-        if(e.getSource() == savePathToFile){
+        if(e.getSource().equals(savePathToFile)){
             savePath();
         }
+        System.out.println("menu clicked");
     }
     public void savePath(){
+        
+       
+           
+        try{
+            FileWriter pointsWriter = new FileWriter("./RobotController\\memory\\points.txt");
+            String pointsText = "";
+           for(double[] point: panel.path.points)
+               pointsText += String.format("%f,%f\n", point[0], point[1]);
+            pointsWriter.write(pointsText);
+            pointsWriter.close();
 
+            FileWriter distancesWriter = new FileWriter("./RobotController\\memory\\distances.txt");
+            String distanceText = "";
+            for(double distance: panel.path.distances)
+               distanceText += String.format("%f\n", distance);
+            distancesWriter.write(distanceText);
+            distancesWriter.close();
+            System.out.println("Path Saved");
+        }
+        catch(Exception e){
+            System.out.println("Couldn't open memory files. Check memory folder. " );
+            e.printStackTrace();
+        }
     }
     
 }
@@ -174,7 +202,10 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     }
 
     public void updateHover(Graphics g){
-       if(!mode.equals("distance")){
+        if(mode == "stop"){
+
+        }
+       else if(!mode.equals("distance")){
             g.setColor(GUIConstants.dotColor);
             g.fillOval(mousePos[0]-GUIConstants.dotRadius/2, mousePos[1] - GUIConstants.dotRadius/2, GUIConstants.dotRadius, GUIConstants.dotRadius);
        }
@@ -190,6 +221,10 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
        }
     }
     public void updateShape(MouseEvent e){
+        if(e.getButton() == MouseEvent.BUTTON3){
+            mode = "stop";
+            lines.remove(lines.size()-1);
+        }
         mousePos[0] = e.getX();
         mousePos[1] = e.getY();
         if(mode.equals("start")){
@@ -231,7 +266,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             for(int i = 0; i<points.size(); i++){
                 p[i] = points.get(i);
             }
-            Path path = new Path(p, distanceArr,angles );
+            path = new Path(p, distanceArr,angles );
             double[] arc = path.segments.get(path.segments.size()-2).toGUI();
             arcs.add(arc);
             mode = "second endpoint";
@@ -246,6 +281,12 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
           int[][] line2 = {lines.get(lines.size()-1)[1], mousePos};
           lines.add(line2);
            
+        }
+        else if(mode.equals("stop") && e.getButton() == MouseEvent.BUTTON1){
+            int[][] line2 = {lines.get(lines.size()-1)[1], mousePos};
+           
+            lines.add(line2);
+            mode = "second endpoint";
         }
 
     }

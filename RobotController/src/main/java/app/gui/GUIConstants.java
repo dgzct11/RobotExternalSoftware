@@ -25,4 +25,7 @@ public class GUIConstants {
     public static Color dotColor = new Color(25,25,100);
     public static Color lineColor = new Color(25,100,25);
     public static BasicStroke lineStroke = new BasicStroke(5);
+    public static Color velocityPlanningColor = new Color(255,255,255);
+    public static int velocityAxisOffset = 50;
+    public static Color velocityAxisColor = new Color(0,0,0);
 }
