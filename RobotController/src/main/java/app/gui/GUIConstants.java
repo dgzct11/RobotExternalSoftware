@@ -1,5 +1,6 @@
 package app.gui;
-
+import java.awt.Color;
+import java.awt.BasicStroke;
 public class GUIConstants {
     public static int controlPanelWidth = 400;
     public static int controlPanelHeight = 800;
@@ -20,5 +21,8 @@ public class GUIConstants {
     public static int trajectoryPlanningY = 0;
     
     
-    public static int dotRadius = 50;
+    public static int dotRadius = 15;
+    public static Color dotColor = new Color(25,25,100);
+    public static Color lineColor = new Color(25,100,25);
+    public static BasicStroke lineStroke = new BasicStroke(5);
 }
