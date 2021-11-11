@@ -20,12 +20,15 @@ public class MainWindow {
     Velocity velocity;
     public void display() {
         trajectoryPlanning = new TrajectoryPlanning();
-        trajectoryPlanning.display();
-
         controlPanel = new SubsystemControlPanel();
-        controlPanel.display();
-
         velocity = new Velocity();
+       
+        trajectoryPlanning.setVelocity(velocity);
+        velocity.setTrajectory(trajectoryPlanning);
+
+        
+        trajectoryPlanning.display();
         velocity.display();
+        controlPanel.display();
     }
 }

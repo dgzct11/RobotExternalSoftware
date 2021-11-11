@@ -29,12 +29,16 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     JFrame frame;
     Panel panel;
     JMenuItem savePathToFile = new JMenuItem("Save Path");
+    Velocity velocity;
+    public void setVelocity(Velocity velocityPlanning){
+        velocity = velocityPlanning;
+    }
     public void display(){
         frame = new JFrame();
         frame.setTitle("Trajectory Planning");
        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        panel = new Panel("./RobotController\\resources\\deepSpace.jpeg");
+        panel = new Panel("./RobotController\\resources\\deepSpace.jpeg", velocity);
         frame.add(panel);
 
         
@@ -101,6 +105,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     public String mode;
     public int[] mousePos = new int[2];
 
+    public Velocity velocity;
     public ArrayList<int[]> dots = new ArrayList<int[]>();
    
     public ArrayList<int[][]>  lines = new ArrayList<int[][]>();
@@ -110,7 +115,8 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     public Path path;
 
 
-    public Panel(String path) {
+    public Panel(String path, Velocity velocityPlanning) {
+        velocity = velocityPlanning;
         fieldImage = Toolkit.getDefaultToolkit().getImage(path);
         
         this.addMouseListener(this);
@@ -139,6 +145,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             //x, y, 
             g.drawArc((int)arc[0], (int)arc[1], (int)arc[2], (int)arc[3], (int)arc[4], (int)arc[5]);
         }
+        
         
     }
     public int getHeight(){
@@ -280,7 +287,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
           
           int[][] line2 = {lines.get(lines.size()-1)[1], mousePos};
           lines.add(line2);
-           
+           velocity.panel.updateFinalDistance();
         }
         else if(mode.equals("stop") && e.getButton() == MouseEvent.BUTTON1){
             int[][] line2 = {lines.get(lines.size()-1)[1], mousePos};

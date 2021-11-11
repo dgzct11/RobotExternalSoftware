@@ -31,13 +31,17 @@ import java.awt.Graphics2D;
 public class Velocity extends JFrame{
     JFrame frame;
     VPanel panel;
+    TrajectoryPlanning trajectory;
+    public void setTrajectory(TrajectoryPlanning trajectoryPlanning){
+        trajectory = trajectoryPlanning;
+    }
     public void display(){
         frame = new JFrame();
         frame.setTitle("Velocity Planning");
         GUIConstants.velocityPlanningY = GUIConstants.trajectoryPlanningY + GUIConstants.trajectoryPlanningHeight;
         GUIConstants.velocityPlanningWidth = GUIConstants.trajectoryPlanningWidth;
 
-        panel = new VPanel();
+        panel = new VPanel(trajectory);
         frame.add(panel);
             
         frame.setSize(panel.getPreferredSize());
@@ -55,18 +59,21 @@ public class Velocity extends JFrame{
     public int[] mousePos = new int[2];
 
  
-   
+    public TrajectoryPlanning trajectory;
     public ArrayList<int[][]>  lines = new ArrayList<int[][]>();
     public ArrayList<double[]> points = new ArrayList<double[]>();
     public Kinematics kinematics;
 
 
-    public VPanel() {
-   
+    public VPanel(TrajectoryPlanning trajectoryPlanning) {
+        trajectory = trajectoryPlanning;
         
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
         mode = "start";
+        double[] point = {0,0};
+        points.add(point);
+        points.add(point);
     }
 
     @Override
@@ -81,6 +88,11 @@ public class Velocity extends JFrame{
         g.drawLine(GUIConstants.velocityAxisOffset, GUIConstants.velocityPlanningHeight - GUIConstants.velocityAxisOffset, GUIConstants.velocityAxisOffset,   GUIConstants.velocityAxisOffset);
    
     }
+    
+    public void updateFinalDistance(){
+        points.get(2)[0] = trajectory.panel.path.totalDistance;
+    }
+
   
     @Override
     public Dimension getPreferredSize() {
