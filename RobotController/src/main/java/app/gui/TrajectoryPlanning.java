@@ -44,11 +44,11 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         
         System.out.printf("position: %d %d", panel.getWidth(), panel.getHeight());
         System.out.println(panel.getPreferredSize());
-        GUIConstants.trajectoryPlanningWidth = panel.getPreferredSize().width;
-        GUIConstants.trajectoryPlanningHeight = panel.getPreferredSize().height;
+       
 
        
         frame.setSize(panel.getPreferredSize());
+       
         JMenuBar menuBar = new JMenuBar();
         JMenu menuActions = new JMenu("Actions");
         menuActions.add(savePathToFile);
@@ -61,6 +61,9 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         frame.pack();
         frame.setLocation(GUIConstants.trajectoryPlanningX, GUIConstants.trajectoryPlanningY);
         frame.setVisible(true);
+        GUIConstants.trajectoryPlanningWidth = frame.getWidth();
+        
+        GUIConstants.trajectoryPlanningHeight = frame.getHeight();
     }
     public void actionPerformed(ActionEvent e){
         if(e.getSource().equals(savePathToFile)){
@@ -76,7 +79,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
             FileWriter pointsWriter = new FileWriter("./RobotController\\memory\\points.txt");
             String pointsText = "";
            for(double[] point: panel.path.points)
-               pointsText += String.format("%f,%f\n", point[0], point[1]);
+               pointsText += String.format("%f,%f\n", point[0]/GUIConstants.pixels_per_meter, point[1]/GUIConstants.pixels_per_meter);
             pointsWriter.write(pointsText);
             pointsWriter.close();
 
@@ -126,7 +129,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
 
     @Override
     public void paint(Graphics g1) {
-        
+        super.paintComponent(g1);
         Graphics2D g = (Graphics2D) g1;
         g.drawImage(fieldImage, 0, 0, null);
 
@@ -145,8 +148,8 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             //x, y, 
             g.drawArc((int)arc[0], (int)arc[1], (int)arc[2], (int)arc[3], (int)arc[4], (int)arc[5]);
         }
-        
-        
+      
+        velocity.panel.repaint();
     }
     public int getHeight(){
         return fieldImage.getHeight(null);
@@ -204,8 +207,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         mousePos[0] = e.getX();
         mousePos[1] = e.getY();
       
-        repaint();
-        
+       repaint();
     }
 
     public void updateHover(Graphics g){
@@ -268,23 +270,25 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             double[] distanceArr = new double[distances.size()];
             double[] angles = new double[distances.size()+1];
             for(int i = 0; i<distanceArr.length; i++){
-                distanceArr[i] = distances.get(i); 
+                distanceArr[i] = distances.get(i)/GUIConstants.pixels_per_meter; 
             }
             for(int i = 0; i<points.size(); i++){
-                p[i] = points.get(i);
+                p[i][0] = points.get(i)[0]/GUIConstants.pixels_per_meter;
+                p[i][1] = points.get(i)[1]/GUIConstants.pixels_per_meter;
             }
+
             path = new Path(p, distanceArr,angles );
             double[] arc = path.segments.get(path.segments.size()-2).toGUI();
             arcs.add(arc);
             mode = "second endpoint";
-            
+           
           for(int i = 0; i<path.segments.size(); i+=2){
               Segment segment = path.segments.get(i);
-              int[][] line = {{(int)segment.startPoint[0], (int)segment.startPoint[1]},
-              {(int)segment.endPoint[0], (int)segment.endPoint[1]}};
+              int[][] line = {{(int)(segment.startPoint[0]*GUIConstants.pixels_per_meter), (int)(segment.startPoint[1]*GUIConstants.pixels_per_meter)},
+              {(int)(segment.endPoint[0]*GUIConstants.pixels_per_meter), (int)(segment.endPoint[1]*GUIConstants.pixels_per_meter)}};
               lines.set(i/2, line);
           }
-          
+        
           int[][] line2 = {lines.get(lines.size()-1)[1], mousePos};
           lines.add(line2);
            velocity.panel.updateFinalDistance();

@@ -1,5 +1,6 @@
 package app.gui.trajectory;
 
+import app.gui.GUIConstants;
 
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
@@ -69,7 +70,7 @@ public class Circle extends Segment {
 
     }
     public double[] toGUI(){
-        double[] result = {center[0]-radius, center[1]-radius, 2*radius, 2*radius, -getAngle(startPoint), -getTotalAngle()};
+        double[] result = {(center[0]-radius)*GUIConstants.pixels_per_meter, (center[1]-radius)*GUIConstants.pixels_per_meter, (2*radius)*GUIConstants.pixels_per_meter, (2*radius)*GUIConstants.pixels_per_meter, -getAngle(startPoint), -getTotalAngle()};
         //g.drawArc(arc[0], arc[1], width, height, startAngle, arcAngle);
         return result;
     }

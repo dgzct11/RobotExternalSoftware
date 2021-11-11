@@ -7,9 +7,11 @@ import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.io.FileWriter;
+import java.security.Guard;
 import java.util.ArrayList;
 import java.awt.Image;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -64,35 +66,81 @@ public class Velocity extends JFrame{
     public ArrayList<double[]> points = new ArrayList<double[]>();
     public Kinematics kinematics;
 
+    String totalTime;
+    String totalDistance;
+
 
     public VPanel(TrajectoryPlanning trajectoryPlanning) {
         trajectory = trajectoryPlanning;
         
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
-        mode = "start";
+        mode = "point distance";
         double[] point = {0,0};
         points.add(point);
-        points.add(point);
+        double[] point1 = {1,0};
+        points.add(point1);
+
+     
     }
 
     @Override
     public void paint(Graphics g1) {
-        
+        super.paintComponent(g1);
         Graphics2D g = (Graphics2D) g1;
-        g.setBackground(GUIConstants.velocityPlanningColor);
         
+        g.setBackground(GUIConstants.velocityPlanningColor);
+        g.drawString("Total Time: ", GUIConstants.timeX, GUIConstants.timeY);
+        g.drawString("Total Distance: " + points.get(1)[0], GUIConstants.distanceX, GUIConstants.distanceY);
+
         //draw axis
         g.setColor(GUIConstants.velocityAxisColor);
         g.drawLine(GUIConstants.velocityAxisOffset, GUIConstants.velocityPlanningHeight - GUIConstants.velocityAxisOffset, GUIConstants.velocityPlanningWidth-GUIConstants.velocityAxisOffset,  GUIConstants.velocityPlanningHeight - GUIConstants.velocityAxisOffset);
         g.drawLine(GUIConstants.velocityAxisOffset, GUIConstants.velocityPlanningHeight - GUIConstants.velocityAxisOffset, GUIConstants.velocityAxisOffset,   GUIConstants.velocityAxisOffset);
    
-    }
-    
-    public void updateFinalDistance(){
-        points.get(2)[0] = trajectory.panel.path.totalDistance;
+        //draw Dots
+
+        g.setColor(GUIConstants.velocityDotsColor);
+        for(double[] point: points){
+            g.fillOval(xToGX(point[0]) -  GUIConstants.velocityDotRadius/2, yToGY(point[1]) -  GUIConstants.velocityDotRadius/2, GUIConstants.velocityDotRadius, GUIConstants.velocityDotRadius);
+        }
+
+        //draw lines
+        g.setColor(GUIConstants.velocityLineColor);
+        g.setStroke(GUIConstants.velocityLineStroke);
+        for(int i = 1; i<points.size(); i++){
+            g.drawLine(xToGX(points.get(i-1)[0]), yToGY(points.get(i-1)[1]), xToGX(points.get(i)[0]), yToGY(points.get(i)[1]));
+        }
+        updateHover(g);
+
     }
 
+    public int xToGX(double x){
+        if(trajectory.panel.path == null){
+            if(x == 0){
+                return GUIConstants.velocityAxisOffset;
+            }
+            return (int)(GUIConstants.velocityMaxX) + GUIConstants.velocityAxisOffset;
+        }
+        
+        return (int)(x/trajectory.panel.path.totalDistance * GUIConstants.velocityMaxX + GUIConstants.velocityAxisOffset);
+    }
+    public int yToGY(double y){
+        return (int)(GUIConstants.velocityPlanningHeight  - GUIConstants.velocityAxisOffset - y/GUIConstants.maxVelocity * (GUIConstants.velocityPlanningHeight-GUIConstants.velocityAxisOffset));
+    }
+    public void update(){
+        repaint();
+    }
+    public void updateFinalDistance(){
+        points.get(points.size()-1)[0] = trajectory.panel.path.totalDistance;
+    }
+
+    public void updateHover(Graphics g){
+        if(mode.equals("point distance")){
+            g.setColor(GUIConstants.velocityHoverPoint);
+            g.fillOval(mousePos[0] - GUIConstants.velocityDotRadius/2, yToGY(0) - GUIConstants.velocityDotRadius/2, GUIConstants.velocityDotRadius, GUIConstants.velocityDotRadius);
+        }
+    }
   
     @Override
     public Dimension getPreferredSize() {
@@ -143,7 +191,9 @@ public class Velocity extends JFrame{
     @Override
     public void mouseMoved(MouseEvent e) {
         // TODO Auto-generated method stub
-        
+        mousePos[0] = e.getX();
+        mousePos[1] = e.getY();
+        repaint();
     }
 
 
