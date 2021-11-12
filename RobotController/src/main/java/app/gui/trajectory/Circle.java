@@ -32,7 +32,7 @@ public class Circle extends Segment {
 
         double startAngle = getAngle(startPoint);
         double endAngle = getAngle(endPoint);
-        System.out.printf("\nangleDiff: %f\nstartAngle: %f\nendAngle: %f\nshouldTurnLeft: %b\n", angleDiff, startAngle, endAngle, M.shouldTurnLeft(startAngle, endAngle));
+       
         if(M.shouldTurnLeft(startAngle, endAngle)){
            
             return new Position(radius*Math.cos(Math.toRadians(angleDiff + startAngle))+center[0], center[1] + radius*Math.sin( Math.toRadians(startAngle + angleDiff)), (startAngle+angleDiff+90)%360);

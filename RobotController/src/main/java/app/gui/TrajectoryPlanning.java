@@ -29,6 +29,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     JFrame frame;
     Panel panel;
     JMenuItem savePathToFile = new JMenuItem("Save Path");
+    JMenuItem saveVelocity = new JMenuItem("Save Velocity");
     Velocity velocity;
     public void setVelocity(Velocity velocityPlanning){
         velocity = velocityPlanning;
@@ -52,8 +53,10 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         JMenuBar menuBar = new JMenuBar();
         JMenu menuActions = new JMenu("Actions");
         menuActions.add(savePathToFile);
+        menuActions.add(saveVelocity);
         savePathToFile.addActionListener(this);
-
+        
+        saveVelocity.addActionListener(this);
         menuBar.add(menuActions);
 
         frame.setJMenuBar(menuBar);
@@ -69,7 +72,24 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         if(e.getSource().equals(savePathToFile)){
             savePath();
         }
+        if(e.getSource().equals(saveVelocity)){
+            saveV();
+        }
         System.out.println("menu clicked");
+    }
+    public void saveV(){
+        try{
+            FileWriter velocityWriter = new FileWriter("./RobotController\\memory\\velocity.txt");
+            String text = "";
+           for(double[] point: panel.velocity.panel.kinematics.velocities)
+               text += String.format("%f,%f\n", point[0], point[1]);
+            velocityWriter.write(text);
+            velocityWriter.close();
+        }
+        catch(Exception e){
+            System.out.println("Couldn't open memory files. Check memory folder. " );
+            e.printStackTrace();
+        }
     }
     public void savePath(){
         
@@ -150,6 +170,8 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         }
       
         velocity.panel.repaint();
+        if(path != null)
+            displayVelocityPoints(g);
     }
     public int getHeight(){
         return fieldImage.getHeight(null);
@@ -228,6 +250,16 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             dots.set(dots.size()-1, dot);
             distances.set(distances.size()-1, M.distance(dot, l[1]));
        }
+    }
+    public void displayVelocityPoints(Graphics g){
+        for(double[] point: velocity.panel.points){
+           double[] dot = path.getPosition(point[0]).point;
+           dot[0] *= GUIConstants.pixels_per_meter;
+           dot[1] *= GUIConstants.pixels_per_meter;
+           g.setColor(GUIConstants.velocityDotsColor);
+           g.fillOval((int)dot[0] - GUIConstants.velocityDotRadius/2, (int)dot[1] - GUIConstants.velocityDotRadius/2, GUIConstants.velocityDotRadius, GUIConstants.velocityDotRadius);
+
+        }
     }
     public void updateShape(MouseEvent e){
         if(e.getButton() == MouseEvent.BUTTON3){

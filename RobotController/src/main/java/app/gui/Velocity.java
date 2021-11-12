@@ -69,6 +69,8 @@ public class Velocity extends JFrame{
     String totalTime;
     String totalDistance;
 
+    int currentIndex = 1;
+
 
     public VPanel(TrajectoryPlanning trajectoryPlanning) {
         trajectory = trajectoryPlanning;
@@ -80,6 +82,8 @@ public class Velocity extends JFrame{
         points.add(point);
         double[] point1 = {1,0};
         points.add(point1);
+        double[] point2 = {1,0};
+        points.add(point2);
 
      
     }
@@ -90,8 +94,8 @@ public class Velocity extends JFrame{
         Graphics2D g = (Graphics2D) g1;
         
         g.setBackground(GUIConstants.velocityPlanningColor);
-        g.drawString("Total Time: ", GUIConstants.timeX, GUIConstants.timeY);
-        g.drawString("Total Distance: " + points.get(1)[0], GUIConstants.distanceX, GUIConstants.distanceY);
+        g.drawString("Total Time: " + (kinematics == null ? "":kinematics.getTotalTime()), GUIConstants.timeX, GUIConstants.timeY);
+        g.drawString("Total Distance: " + points.get(points.size()-1)[0], GUIConstants.distanceX, GUIConstants.distanceY);
 
         //draw axis
         g.setColor(GUIConstants.velocityAxisColor);
@@ -112,7 +116,9 @@ public class Velocity extends JFrame{
             g.drawLine(xToGX(points.get(i-1)[0]), yToGY(points.get(i-1)[1]), xToGX(points.get(i)[0]), yToGY(points.get(i)[1]));
         }
         updateHover(g);
-
+        trajectory.panel.repaint();
+        displayAccelerations(g);
+        sortPoints();
     }
 
     public int xToGX(double x){
@@ -125,6 +131,18 @@ public class Velocity extends JFrame{
         
         return (int)(x/trajectory.panel.path.totalDistance * GUIConstants.velocityMaxX + GUIConstants.velocityAxisOffset);
     }
+    public double gxToX(double gx){
+        if(trajectory.panel.path == null){
+            return 0;
+        }
+        return (gx-GUIConstants.velocityAxisOffset) /GUIConstants.velocityMaxX * trajectory.panel.path.totalDistance;
+    }
+    public double gyToY(double gy){
+        if(trajectory.panel.path == null)
+            return 0;
+        return  (GUIConstants.velocityPlanningHeight  - GUIConstants.velocityAxisOffset -gy) * GUIConstants.maxVelocity / (GUIConstants.velocityPlanningHeight-GUIConstants.velocityAxisOffset);
+    }
+    
     public int yToGY(double y){
         return (int)(GUIConstants.velocityPlanningHeight  - GUIConstants.velocityAxisOffset - y/GUIConstants.maxVelocity * (GUIConstants.velocityPlanningHeight-GUIConstants.velocityAxisOffset));
     }
@@ -135,13 +153,49 @@ public class Velocity extends JFrame{
         points.get(points.size()-1)[0] = trajectory.panel.path.totalDistance;
     }
 
-    public void updateHover(Graphics g){
-        if(mode.equals("point distance")){
-            g.setColor(GUIConstants.velocityHoverPoint);
-            g.fillOval(mousePos[0] - GUIConstants.velocityDotRadius/2, yToGY(0) - GUIConstants.velocityDotRadius/2, GUIConstants.velocityDotRadius, GUIConstants.velocityDotRadius);
+    public void sortPoints(){
+        for(int i = 0; i<currentIndex; i++){
+            if(points.get(i)[0]>points.get(currentIndex)[0]){
+                double[] currentPoint = points.remove(currentIndex);
+                currentIndex = i;
+                points.add(i, currentPoint);
+                break;
+            }
         }
     }
-  
+    public void updateHover(Graphics g){
+        if(mode.equals("point distance")){
+            double[] point = {gxToX(mousePos[0]), 0};
+            points.set(currentIndex, point);
+        }
+        else if(mode.equals("point velocity")){
+            points.get(currentIndex)[1] = gyToY(mousePos[1]);
+            g.drawString(String.format("%f m/s", gyToY(mousePos[1])), mousePos[0], mousePos[1]);
+        }
+    }
+    public void updateMode(){
+        if(mode.equals("point distance")){
+            mode ="point velocity";
+        }
+        else if(mode.equals("point velocity")){
+            double[][] v = new double[points.size()][2];
+            for(int i = 0; i<v.length; i++){
+                v[i] = points.get(i);
+            }
+            kinematics = new Kinematics(trajectory.panel.path, v);
+            double[] point = {0,0};
+            points.add(currentIndex+1,point);
+            currentIndex ++;
+            
+            mode = "point distance";
+        }
+    }
+    public void displayAccelerations(Graphics g){
+        if(kinematics == null) return;
+        for(int i = 1; i<kinematics.segments.size(); i++){
+            g.drawString(String.format("%f m/s^2", kinematics.segments.get(i-1).acceleration), xToGX((points.get(i)[0]+points.get(i-1)[0])/2), yToGY((points.get(i)[1]+points.get(i-1)[1])/2));
+        }
+    }
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(GUIConstants.velocityPlanningWidth, GUIConstants.velocityPlanningHeight);
@@ -149,7 +203,9 @@ public class Velocity extends JFrame{
     @Override
     public void mouseClicked(MouseEvent e) {
         // TODO Auto-generated method stub
-        
+        mousePos[0] = e.getX();
+        mousePos[1] = e.getY();
+        updateMode();
     }
 
 

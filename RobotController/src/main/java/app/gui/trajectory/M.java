@@ -54,6 +54,7 @@ public class M {
     }
     return result;
   }
+
   public static double distance(double[] p1, double[] p2){
     return Math.sqrt( Math.pow(p1[1] - p2[1], 2) + Math.pow(p1[0] - p2[0], 2));
   }

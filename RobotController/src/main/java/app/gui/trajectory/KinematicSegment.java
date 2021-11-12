@@ -9,7 +9,7 @@ public class KinematicSegment{
     public double[] start;
     public double[] end;
     double totalTime;
-    double acceleration;
+    public double acceleration;
     double distance;
     public KinematicSegment(double[] s, double[] e){
         start = s;
