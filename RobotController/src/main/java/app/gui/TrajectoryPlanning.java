@@ -17,6 +17,8 @@ import javax.swing.event.MouseInputListener;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
+import app.gui.control_panel.SCSetPoint;
 import app.gui.trajectory.Line;
 import app.gui.trajectory.M;
 import app.gui.trajectory.Path;
@@ -31,15 +33,19 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     JMenuItem savePathToFile = new JMenuItem("Save Path");
     JMenuItem saveVelocity = new JMenuItem("Save Velocity");
     Velocity velocity;
+    SubsystemControlPanel controlPanel;
     public void setVelocity(Velocity velocityPlanning){
         velocity = velocityPlanning;
+    }
+    public void setControlPanel(SubsystemControlPanel control){
+        controlPanel = control;
     }
     public void display(){
         frame = new JFrame();
         frame.setTitle("Trajectory Planning");
        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        panel = new Panel("./RobotController\\resources\\deepSpace.jpeg", velocity);
+        panel = new Panel("./RobotController\\resources\\deepSpace.jpeg", velocity, controlPanel);
         frame.add(panel);
 
         
@@ -91,6 +97,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
             e.printStackTrace();
         }
     }
+
     public void savePath(){
         
        
@@ -99,7 +106,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
             FileWriter pointsWriter = new FileWriter("./RobotController\\memory\\points.txt");
             String pointsText = "";
            for(double[] point: panel.path.points)
-               pointsText += String.format("%f,%f\n", point[0]/GUIConstants.pixels_per_meter, point[1]/GUIConstants.pixels_per_meter);
+               pointsText += String.format("%f,%f\n", point[0], point[1]);
             pointsWriter.write(pointsText);
             pointsWriter.close();
 
@@ -129,6 +136,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     public int[] mousePos = new int[2];
 
     public Velocity velocity;
+    public SubsystemControlPanel controlPanel;
     public ArrayList<int[]> dots = new ArrayList<int[]>();
    
     public ArrayList<int[][]>  lines = new ArrayList<int[][]>();
@@ -138,10 +146,10 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     public Path path;
 
 
-    public Panel(String path, Velocity velocityPlanning) {
+    public Panel(String path, Velocity velocityPlanning, SubsystemControlPanel control) {
         velocity = velocityPlanning;
         fieldImage = Toolkit.getDefaultToolkit().getImage(path);
-        
+        controlPanel = control;
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
         mode = "start";
@@ -172,6 +180,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         velocity.panel.repaint();
         if(path != null)
             displayVelocityPoints(g);
+            displayControlPanelPoints(g);
     }
     public int getHeight(){
         return fieldImage.getHeight(null);
@@ -261,6 +270,18 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
 
         }
     }
+    public void displayControlPanelPoints(Graphics g){
+        
+        for(SCSetPoint point:  controlPanel.panel.setPoints){
+            double[] dot = path.getPosition(point.startDistance).point;
+            dot[0] *= GUIConstants.pixels_per_meter;
+            dot[1] *= GUIConstants.pixels_per_meter;
+            g.setColor(GUIConstants.controlPanelDotColor);
+            
+            g.fillOval((int)dot[0] - GUIConstants.controlPanelDotRadius/2, (int)dot[1] - GUIConstants.controlPanelDotRadius/2, GUIConstants.controlPanelDotRadius, GUIConstants.controlPanelDotRadius);
+ 
+        }
+    }
     public void updateShape(MouseEvent e){
         if(e.getButton() == MouseEvent.BUTTON3){
             mode = "stop";
@@ -307,9 +328,11 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             for(int i = 0; i<points.size(); i++){
                 p[i][0] = points.get(i)[0]/GUIConstants.pixels_per_meter;
                 p[i][1] = points.get(i)[1]/GUIConstants.pixels_per_meter;
+                
             }
-
+            
             path = new Path(p, distanceArr,angles );
+            System.out.printf("\nPoints: TrjPlann: %f %f\n", path.getEndPoint().x, path.getEndPoint().y);
             double[] arc = path.segments.get(path.segments.size()-2).toGUI();
             arcs.add(arc);
             mode = "second endpoint";

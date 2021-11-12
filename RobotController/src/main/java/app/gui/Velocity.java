@@ -84,7 +84,7 @@ public class Velocity extends JFrame{
         points.add(point1);
         double[] point2 = {1,0};
         points.add(point2);
-
+        this.setBackground(GUIConstants.velocityPlanningColor);
      
     }
 
@@ -99,6 +99,7 @@ public class Velocity extends JFrame{
 
         //draw axis
         g.setColor(GUIConstants.velocityAxisColor);
+        g.setStroke(GUIConstants.velocityAxisStroke);
         g.drawLine(GUIConstants.velocityAxisOffset, GUIConstants.velocityPlanningHeight - GUIConstants.velocityAxisOffset, GUIConstants.velocityPlanningWidth-GUIConstants.velocityAxisOffset,  GUIConstants.velocityPlanningHeight - GUIConstants.velocityAxisOffset);
         g.drawLine(GUIConstants.velocityAxisOffset, GUIConstants.velocityPlanningHeight - GUIConstants.velocityAxisOffset, GUIConstants.velocityAxisOffset,   GUIConstants.velocityAxisOffset);
    
@@ -162,19 +163,33 @@ public class Velocity extends JFrame{
                 break;
             }
         }
+        for(int i = currentIndex+1; i<points.size(); i++){
+            if(points.get(i)[0]<points.get(currentIndex)[0]){
+                double[] currentPoint = points.remove(currentIndex);
+                currentIndex = i;
+                points.add(i, currentPoint);
+                break;
+            }
+        }
     }
     public void updateHover(Graphics g){
         if(mode.equals("point distance")){
             double[] point = {gxToX(mousePos[0]), 0};
-            points.set(currentIndex, point);
+            if(trajectory.panel.path != null && point[0]<trajectory.panel.path.totalDistance && point[0]>0)
+                points.set(currentIndex, point);
         }
         else if(mode.equals("point velocity")){
             points.get(currentIndex)[1] = gyToY(mousePos[1]);
             g.drawString(String.format("%f m/s", gyToY(mousePos[1])), mousePos[0], mousePos[1]);
         }
     }
-    public void updateMode(){
-        if(mode.equals("point distance")){
+    public void updateMode(MouseEvent e){
+         if(e.getButton() == MouseEvent.BUTTON3){
+            mode = "stop";
+            points.remove(currentIndex);
+            return;
+        }
+        else if(mode.equals("point distance")){
             mode ="point velocity";
         }
         else if(mode.equals("point velocity")){
@@ -188,6 +203,12 @@ public class Velocity extends JFrame{
             currentIndex ++;
             
             mode = "point distance";
+        }
+       
+        else if(mode.equals("stop")){
+            mode = "point distance";
+            double[] point = {gxToX(mousePos[0]), 0};
+            points.add(currentIndex, point);
         }
     }
     public void displayAccelerations(Graphics g){
@@ -205,7 +226,7 @@ public class Velocity extends JFrame{
         // TODO Auto-generated method stub
         mousePos[0] = e.getX();
         mousePos[1] = e.getY();
-        updateMode();
+        updateMode(e);
     }
 
 

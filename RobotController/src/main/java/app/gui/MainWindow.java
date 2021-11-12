@@ -24,8 +24,9 @@ public class MainWindow {
         velocity = new Velocity();
        
         trajectoryPlanning.setVelocity(velocity);
+        trajectoryPlanning.setControlPanel(controlPanel);
         velocity.setTrajectory(trajectoryPlanning);
-
+        controlPanel.setTrajectory(trajectoryPlanning);
         
         trajectoryPlanning.display();
         velocity.display();

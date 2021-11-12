@@ -94,9 +94,8 @@ public class Path {
         */
        
         if(distance>totalDistance){
-            Segment seg = segments.get(segments.size()-1);
-            currentIndex = segments.size()-1;
-            return new Position(seg.endPoint, M.angleFromSlope(seg.startPoint, seg.endPoint));
+          
+            return  getEndPoint();
         }
         double currentDistance = 0;
         int index = 0;
