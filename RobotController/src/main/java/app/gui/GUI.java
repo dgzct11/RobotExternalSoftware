@@ -20,9 +20,10 @@ public class GUI {
         FieldPanel fpan = new FieldPanel();
         JFrame field = WindowMan.addFrame("Field", fpan);
 
-        ArrayList<Double> scores = new ArrayList<Double>();
+        ArrayList<Double> scores = new ArrayList<>();
         Random random = new Random();
         int maxDataPoints = 100;
+        scores.add(0.0);
         for (int i = 0; i < maxDataPoints ; i++) {
             scores.add(random.nextDouble()*100);
         }

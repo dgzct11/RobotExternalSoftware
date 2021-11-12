@@ -13,6 +13,7 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.awt.Stroke;
 
@@ -76,9 +77,9 @@ public class WindowMan {
     }
 
     public static class MouseHandler extends MouseAdapter {
-        public static ArrayList<Point[]> points = new ArrayList<Point[]>();
-        public static Point p1 = new Point(0, 0);
-        public static Point p2 = new Point(0, 0);
+        public static ArrayList<Point> points = new ArrayList<>();
+        public static Point initial = new Point(0, 0);
+        public static Point recent = new Point(0, 0);
         public static boolean drawing = false;
         private JPanel fpan;
         private JPanel vpan;
@@ -92,8 +93,8 @@ public class WindowMan {
         @Override
         public void mousePressed(MouseEvent e) {
             drawing = true;
-            p2 = e.getPoint();
-            if (first) {p1 = p2; first = false;}
+            recent = e.getPoint();
+            if (first) {initial = recent; first = false;}
             fpan.repaint();
         }
 
@@ -101,14 +102,13 @@ public class WindowMan {
         public void mouseReleased(MouseEvent e) {
             drawing = false;
             fpan.repaint();
-            points.add(new Point[] {p1,p2});
-            p1 = p2;
+            points.add(recent);
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
             if (drawing) {
-                p2 = e.getPoint();
+                recent = e.getPoint();
                 fpan.repaint();
             }
         }
@@ -130,20 +130,24 @@ public class WindowMan {
             super.paintComponent(g);
             g.drawImage(img, 0, 0, this);
             Graphics2D g2 = (Graphics2D) g;
+            g2.setColor(Color.ORANGE);
             g2.setRenderingHint(
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setStroke(new BasicStroke(5,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
-            for (int i = 0; i < MouseHandler.points.size(); i++) {
-                g2.setColor((i % 2) == 1 ? Color.RED:Color.BLUE);
-                Line2D line = new Line2D.Float(MouseHandler.points.get(i)[0], MouseHandler.points.get(i)[1]);
-                g2.fillOval(MouseHandler.points.get(i)[0].x-4, MouseHandler.points.get(i)[0].y-4, 10, 10);
-                g2.fillOval(MouseHandler.points.get(i)[1].x-4, MouseHandler.points.get(i)[1].y-4, 10, 10);
-                g2.draw(line);
+            int size = MouseHandler.points.size();
+            Path2D.Double path = new Path2D.Double();
+            path.moveTo(MouseHandler.initial.x, MouseHandler.initial.y);
+            int x1,x2,y1,y2 = 1;
+            for (int i = 1; i < size; i++) {
+                if (MouseHandler.points.get(i).x >= MouseHandler.points.get(i-1).x) {x1 = 1; x2 = -1;} else {x1 = -1; x2 = 1;}
+                if (MouseHandler.points.get(i).y >= MouseHandler.points.get(i-1).y) {y1 = 1; y2 = -1;} else {y1 = 1; y2 = -1;}
+                path.curveTo(MouseHandler.points.get(i-1).x+50*x1,MouseHandler.points.get(i-1).y+50*y1,MouseHandler.points.get(i).x+50*x2, MouseHandler.points.get(i).y+50*y2,MouseHandler.points.get(i).x, MouseHandler.points.get(i).y);
+                g2.fillOval(MouseHandler.points.get(i).x-4, MouseHandler.points.get(i).y-4, 10, 10);
             }
-            Line2D linew = new Line2D.Float(MouseHandler.p1, MouseHandler.p2);
-            g2.draw(linew);
+            path.lineTo(MouseHandler.recent.x, MouseHandler.recent.y);
+            g2.draw(path);
         }
 
         @Override
@@ -182,8 +186,8 @@ public class WindowMan {
     
             List<Point> graphPoints = new ArrayList<>();
             for (int i = 0; i < scores.size(); i++) {
-                int x1 = (int) (i * xScale + padding + labelPadding);
-                int y1 = (int) ((getMaxScore() - scores.get(i)) * yScale + padding);
+                int x1 = (int) ((getMaxScore() - scores.get(i)) * xScale + padding + labelPadding);
+                int y1 = (int) (i * yScale + padding);
                 graphPoints.add(new Point(x1, y1));
             }
     
