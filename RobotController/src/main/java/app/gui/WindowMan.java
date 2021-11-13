@@ -8,12 +8,11 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Path2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.awt.Stroke;
 
@@ -76,8 +75,8 @@ public class WindowMan {
         return frame;
     }
 
-    public static class MouseHandler extends MouseAdapter {
-        public static ArrayList<Point> points = new ArrayList<>();
+    public static class Handler extends MouseAdapter {
+        public static Spline spline = new Spline();
         public static Point initial = new Point(0, 0);
         public static Point recent = new Point(0, 0);
         public static boolean drawing = false;
@@ -85,7 +84,7 @@ public class WindowMan {
         private JPanel vpan;
         boolean first = true;
 
-        public MouseHandler(JPanel fpan, JPanel vpan) {
+        public Handler(JPanel fpan, JPanel vpan) {
             this.fpan = fpan;
             this.vpan = vpan;
         }
@@ -94,7 +93,6 @@ public class WindowMan {
         public void mousePressed(MouseEvent e) {
             drawing = true;
             recent = e.getPoint();
-            if (first) {initial = recent; first = false;}
             fpan.repaint();
         }
 
@@ -102,7 +100,8 @@ public class WindowMan {
         public void mouseReleased(MouseEvent e) {
             drawing = false;
             fpan.repaint();
-            points.add(recent);
+            spline.points.add(recent);
+            if (first) {initial = recent; first = false;}
         }
 
         @Override
@@ -117,7 +116,7 @@ public class WindowMan {
     @SuppressWarnings("serial")
     public static class FieldPanel extends JPanel {
         BufferedImage img;
-        boolean witch;
+        //boolean witch;
 
         public FieldPanel() throws IOException {
             img = ImageIO.read(new File(currentPath + fs + "resources" + fs + "deepSpace.jpeg"));
@@ -136,17 +135,17 @@ public class WindowMan {
                 RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setStroke(new BasicStroke(5,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
-            int size = MouseHandler.points.size();
             Path2D.Double path = new Path2D.Double();
-            path.moveTo(MouseHandler.initial.x, MouseHandler.initial.y);
-            int x1,x2,y1,y2 = 1;
-            for (int i = 1; i < size; i++) {
-                if (MouseHandler.points.get(i).x >= MouseHandler.points.get(i-1).x) {x1 = 1; x2 = -1;} else {x1 = -1; x2 = 1;}
-                if (MouseHandler.points.get(i).y >= MouseHandler.points.get(i-1).y) {y1 = 1; y2 = -1;} else {y1 = 1; y2 = -1;}
-                path.curveTo(MouseHandler.points.get(i-1).x+50*x1,MouseHandler.points.get(i-1).y+50*y1,MouseHandler.points.get(i).x+50*x2, MouseHandler.points.get(i).y+50*y2,MouseHandler.points.get(i).x, MouseHandler.points.get(i).y);
-                g2.fillOval(MouseHandler.points.get(i).x-4, MouseHandler.points.get(i).y-4, 10, 10);
+            g2.fillOval(Handler.initial.x-4, Handler.initial.y-4, 10,10);
+            for (int i = 0; i < Handler.spline.points.size(); i++) {
+                for (float t = 0; t < (float) i-2; t += 0.05f) {
+                    Point pos = Handler.spline.getPoint(t);
+                    path.moveTo(pos.x/2, pos.y/2);
+                    path.lineTo(pos.x/2, pos.y/2);
+                }
+                g2.fillOval(Handler.spline.points.get(i).x-4, (int)Handler.spline.points.get(i).y-4, 10, 10);
             }
-            path.lineTo(MouseHandler.recent.x, MouseHandler.recent.y);
+            g2.fillOval(Handler.recent.x-4, Handler.recent.y-4, 10, 10);
             g2.draw(path);
         }
 

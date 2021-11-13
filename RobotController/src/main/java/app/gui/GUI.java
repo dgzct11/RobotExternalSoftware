@@ -11,7 +11,7 @@ import javax.swing.*;
 
 import app.gui.WindowMan.FieldPanel;
 import app.gui.WindowMan.Graph;
-import app.gui.WindowMan.MouseHandler;
+import app.gui.WindowMan.Handler;
 
 public class GUI {
     @SuppressWarnings("unused")
@@ -32,7 +32,7 @@ public class GUI {
         JFrame velocity = WindowMan.addFrame("Velocity", vpan);
 
 
-        MouseHandler mouseHandler = new MouseHandler(fpan, vpan);
+        Handler mouseHandler = new Handler(fpan, vpan);
         fpan.addMouseListener(mouseHandler);
         fpan.addMouseMotionListener(mouseHandler);
 
