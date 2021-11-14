@@ -2,15 +2,16 @@ package app.gui;
 
 import java.awt.Component;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Random;
 
-import javax.swing.*;
-
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import app.gui.WindowMan.FieldPanel;
-import app.gui.WindowMan.Graph;
 import app.gui.WindowMan.Handler;
 
 public class GUI {
@@ -28,7 +29,7 @@ public class GUI {
             scores.add(random.nextDouble()*100);
         }
 
-        JPanel vpan = new Graph(scores);
+        Graph vpan = new Graph(scores);
         JFrame velocity = WindowMan.addFrame("Velocity", vpan);
 
 
