@@ -198,9 +198,9 @@ public class Velocity extends JFrame{
             displayAccelerations(g);
         }
         else if(mode.equals("edit")){
-            int index = 0;
-            double minDistance = M.distance(points.get(0),gToArr(mousePos));
-            for(int i = 0; i<points.size(); i++){
+            int index = 1;
+            double minDistance = M.distance(points.get(1),gToArr(mousePos));
+            for(int i = 1; i<points.size()-1; i++){
                 if(M.distance(points.get(i),gToArr(mousePos)) < minDistance){
                     index = i;
                     minDistance = M.distance(points.get(i),gToArr(mousePos));
@@ -216,11 +216,33 @@ public class Velocity extends JFrame{
             g.fillOval(point[0]-GUIConstants.dotRadius/2, point[1]  - GUIConstants.dotRadius/2, GUIConstants.dotRadius, GUIConstants.dotRadius);
      
         }
+        else if(mode.equals("edit drag")){
+            int index = 1;
+            double minDistance = M.distance(points.get(0),gToArr(mousePos));
+            for(int i = 1; i<points.size()-1; i++){
+                if(M.distance(points.get(i),gToArr(mousePos)) < minDistance){
+                    index = i;
+                    minDistance = M.distance(points.get(i),gToArr(mousePos));
+                }
+            }
+            double[] point = {gxToX(mousePos[0]), gyToY(mousePos[1])};
+            points.set(index,point);
+           
+            g.drawString(String.format("%f m/s", gyToY(mousePos[1])), 10 + mousePos[0], mousePos[1]);
+            double[][] v = new double[points.size()][2];
+            for(int i = 0; i<v.length; i++){
+                v[i] = points.get(i);
+            }
+            kinematics = new Kinematics(trajectory.panel.path, v);
+            displayAccelerations(g);
+        }
     }
     public void updateMode(MouseEvent e){
          if(e.getButton() == MouseEvent.BUTTON3){
+            if(mode.equals("point distance") || mode.equals("point velocity"))
+                points.remove(currentIndex);
             mode = "stop";
-            points.remove(currentIndex);
+           
             return;
         }
         else if(e.getButton() == MouseEvent.BUTTON2){
@@ -247,6 +269,13 @@ public class Velocity extends JFrame{
             double[] point = {gxToX(mousePos[0]), 0};
             points.add(currentIndex, point);
         }
+        else if(mode.equals("edit")){
+           mode = "edit drag";
+        }
+        else if(mode.equals("edit drag")){
+            mode = "edit";
+        }
+       
     }
     public void displayAccelerations(Graphics g){
         if(kinematics == null) return;

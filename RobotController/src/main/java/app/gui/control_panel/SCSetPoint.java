@@ -13,4 +13,11 @@ public class SCSetPoint {
         endDistance = ed;
         subsystemIdentifier = id;
     }
+
+    public String toString(){
+        String inputString = "";
+        for(Double input: inputs)
+            inputString += input + ",";
+        return String.format("%f,%f:%s\n", startDistance, endDistance, inputString);
+    }
 }

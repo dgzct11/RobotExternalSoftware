@@ -33,6 +33,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     Panel panel;
     JMenuItem savePathToFile = new JMenuItem("Save Path");
     JMenuItem saveVelocity = new JMenuItem("Save Velocity");
+    JMenuItem saveSubsytem = new JMenuItem("Save Subsystem Plan");
     JMenuItem editPath = new JMenuItem("Edit Path");
     JMenuItem editVelocity = new JMenuItem("Edit Velocity");
     Velocity velocity;
@@ -63,12 +64,13 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         JMenu menuActions = new JMenu("Actions");
         menuActions.add(savePathToFile);
         menuActions.add(saveVelocity);
+        menuActions.add(saveSubsytem);
         menuActions.add(editPath);
         menuActions.add(editVelocity);
         editVelocity.addActionListener(this);
         editPath.addActionListener(this);
         savePathToFile.addActionListener(this);
-        
+        saveSubsytem.addActionListener(this);
         saveVelocity.addActionListener(this);
         menuBar.add(menuActions);
         menuActions.setVisible(true);
@@ -97,7 +99,24 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         else if(e.getSource().equals(editVelocity)){
             panel.velocity.panel.mode = "edit";
         }
+        else if(e.getSource().equals(saveSubsytem)){
+            saveSubsystems();
+        }
         System.out.println("menu clicked");
+    }
+    public void saveSubsystems(){
+        try{
+            FileWriter subsystemWriter = new FileWriter("./RobotController\\memory\\subsystem.txt");
+            String text = "";
+           for(SCSetPoint point:controlPanel.panel.setPoints )
+                text += point.toString();
+            subsystemWriter.write(text);
+            subsystemWriter.close();
+        }
+        catch(Exception e){
+            System.out.println("Couldn't open memory files. Check memory folder. " );
+            e.printStackTrace();
+        }
     }
     public void saveV(){
         try{
@@ -112,12 +131,10 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
             System.out.println("Couldn't open memory files. Check memory folder. " );
             e.printStackTrace();
         }
+        
     }
 
-    public void savePath(){
-        
-       
-           
+    public void savePath(){    
         try{
             FileWriter pointsWriter = new FileWriter("./RobotController\\memory\\points.txt");
             String pointsText = "";
