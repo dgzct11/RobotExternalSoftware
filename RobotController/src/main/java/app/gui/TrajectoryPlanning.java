@@ -381,8 +381,8 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
            dot[0] *= GUIConstants.pixels_per_meter;
            dot[1] *= GUIConstants.pixels_per_meter;
            g.setColor(GUIConstants.velocityDotsColor);
-           g.fillOval((int)dot[0] - GUIConstants.velocityDotRadius/2, (int)dot[1] - GUIConstants.velocityDotRadius/2, GUIConstants.velocityDotRadius, GUIConstants.velocityDotRadius);
-
+           g.fillRect((int)dot[0] - GUIConstants.velocityDotRadius/2, (int)dot[1] - GUIConstants.velocityDotRadius/2, GUIConstants.velocityDotRadius, GUIConstants.velocityDotRadius);
+           
         }
     }
     public void displayControlPanelPoints(Graphics g){
