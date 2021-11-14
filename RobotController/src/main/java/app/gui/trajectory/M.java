@@ -1,4 +1,7 @@
 package app.gui.trajectory;
+
+import app.gui.GUIConstants;
+
 public class M {
   
   //subsystems
@@ -46,11 +49,25 @@ public class M {
     }
     return result;
   }
-
+ 
+  public static double[] metersToPixels(double[] arr){
+    double[] result = new double[arr.length];
+    for(int i = 0; i<arr.length; i++)
+      result[i] = arr[i] * GUIConstants.pixels_per_meter;
+    return result;
+  }
   public static double[] intArrToDouble(int[] arr){
     double[] result = new double[arr.length];
     for(int i = 0; i<arr.length; i++){
       result[i] = arr[i];
+    }
+    return result;
+  }
+
+  public static int[] doubleArrToInt(double[] arr){
+    int[] result = new int[arr.length];
+    for(int i = 0; i<arr.length; i++){
+      result[i] = (int)arr[i];
     }
     return result;
   }

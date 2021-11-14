@@ -19,6 +19,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import app.gui.control_panel.SCSetPoint;
+import app.gui.trajectory.Circle;
 import app.gui.trajectory.Line;
 import app.gui.trajectory.M;
 import app.gui.trajectory.Path;
@@ -32,6 +33,8 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     Panel panel;
     JMenuItem savePathToFile = new JMenuItem("Save Path");
     JMenuItem saveVelocity = new JMenuItem("Save Velocity");
+    JMenuItem editPath = new JMenuItem("Edit Path");
+    JMenuItem editVelocity = new JMenuItem("Edit Velocity");
     Velocity velocity;
     SubsystemControlPanel controlPanel;
     public void setVelocity(Velocity velocityPlanning){
@@ -60,12 +63,17 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         JMenu menuActions = new JMenu("Actions");
         menuActions.add(savePathToFile);
         menuActions.add(saveVelocity);
+        menuActions.add(editPath);
+        menuActions.add(editVelocity);
+        editVelocity.addActionListener(this);
+        editPath.addActionListener(this);
         savePathToFile.addActionListener(this);
         
         saveVelocity.addActionListener(this);
         menuBar.add(menuActions);
-
+        menuActions.setVisible(true);
         frame.setJMenuBar(menuBar);
+        menuBar.setVisible(true);
        
         frame.pack();
         frame.setLocation(GUIConstants.trajectoryPlanningX, GUIConstants.trajectoryPlanningY);
@@ -78,8 +86,16 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         if(e.getSource().equals(savePathToFile)){
             savePath();
         }
-        if(e.getSource().equals(saveVelocity)){
+        else if(e.getSource().equals(saveVelocity)){
             saveV();
+        }
+        else if(e.getSource().equals(editPath)){
+           
+            panel.mode = "edit";
+            
+        }
+        else if(e.getSource().equals(editVelocity)){
+            panel.velocity.panel.mode = "edit";
         }
         System.out.println("menu clicked");
     }
@@ -145,7 +161,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     public ArrayList<double[]> points = new ArrayList<double[]>();
     public Path path;
 
-
+    public boolean addedDotAfterSecondEndpoint = false;
     public Panel(String path, Velocity velocityPlanning, SubsystemControlPanel control) {
         velocity = velocityPlanning;
         fieldImage = Toolkit.getDefaultToolkit().getImage(path);
@@ -245,10 +261,87 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         if(mode == "stop"){
 
         }
+        else if(mode.equals("edit drag")){
+            int index = 0;
+            double minDistance = M.distance(M.metersToPixels(path.points[0]), mousePos);
+            for(int i = 0; i<path.points.length; i++){
+                if(M.distance(M.metersToPixels(path.points[i]), mousePos) < minDistance){
+                    index = i;
+                    minDistance =  M.distance(M.metersToPixels(path.points[i]), mousePos);
+                }
+            }
+            double[] point = new double[2];
+            point[0] = mousePos[0];
+            point[1] = mousePos[1];
+            points.set(index, point);
+            try{
+                dots.set(index, M.doubleArrToInt(point));
+            } catch(IndexOutOfBoundsException e){
+                dots.add(index, M.doubleArrToInt(point));
+            }
+            double[][] p = new double[points.size()][2];
+            
+            double[] distanceArr = new double[distances.size()];
+            double[] angles = new double[distances.size()+1];
+            for(int i = 0; i<distanceArr.length; i++){
+                distanceArr[i] = distances.get(i)/GUIConstants.pixels_per_meter; 
+            }
+            for(int i = 0; i<points.size(); i++){
+                p[i][0] = points.get(i)[0]/GUIConstants.pixels_per_meter;
+                p[i][1] = points.get(i)[1]/GUIConstants.pixels_per_meter;
+                
+            }
+            
+            path = new Path(p, distanceArr,angles );
+
+        
+            lines.clear();
+            arcs.clear();
+            
+           
+            for(Segment segment: path.segments){
+              
+                if(segment instanceof Line){
+                    int[][] line = {M.doubleArrToInt(M.metersToPixels( segment.startPoint)),M.doubleArrToInt(M.metersToPixels(segment.endPoint))};
+                    lines.add(line);
+                }
+                else if(segment instanceof Circle){
+                    arcs.add(((Circle)segment).toGUI());
+                }
+                
+            }
+            
+           
+         
+           velocity.panel.updateFinalDistance();
+           
+        }
+        
+        
+        else if(mode.equals("edit")){
+            int index = 0;
+            double minDistance = M.distance(path.points[0], mousePos);
+            for(int i = 0; i<path.points.length; i++){
+                if(M.distance(M.metersToPixels(path.points[i]), mousePos) < minDistance){
+                    index = i;
+                    minDistance =  M.distance(M.metersToPixels(path.points[i]), mousePos);
+                }
+            }
+            double[] point = path.points[index];
+            
+          
+            g.setColor(GUIConstants.highlightColor);
+            g.fillOval((int)(point[0]  *GUIConstants.pixels_per_meter)-GUIConstants.highlightRadius/2, (int)(point[1]  *GUIConstants.pixels_per_meter) - GUIConstants.highlightRadius/2, GUIConstants.highlightRadius, GUIConstants.highlightRadius);
+         
+            g.setColor(GUIConstants.dotColor);
+            g.fillOval((int)(point[0]  *GUIConstants.pixels_per_meter)-GUIConstants.dotRadius/2, (int)(point[1]  *GUIConstants.pixels_per_meter) - GUIConstants.dotRadius/2, GUIConstants.dotRadius, GUIConstants.dotRadius);
+     
+        }
        else if(!mode.equals("distance")){
             g.setColor(GUIConstants.dotColor);
             g.fillOval(mousePos[0]-GUIConstants.dotRadius/2, mousePos[1] - GUIConstants.dotRadius/2, GUIConstants.dotRadius, GUIConstants.dotRadius);
        }
+       
        else{
             
             int[][] l = lines.get(lines.size()-2);
@@ -256,7 +349,12 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             Line mouseLine = new Line(mousePos, -1/((double)((line.endPoint[1]-line.startPoint[1])/(line.endPoint[0] - line.startPoint[0]))));
             double[] intersection = line.getIntersection(mouseLine);
             int[] dot = {(int)intersection[0], (int)intersection[1]};
-            dots.set(dots.size()-1, dot);
+            if(addedDotAfterSecondEndpoint)
+                dots.set(dots.size()-1, dot);
+            else{
+                dots.add(dot);
+                addedDotAfterSecondEndpoint = true;
+            }
             distances.set(distances.size()-1, M.distance(dot, l[1]));
        }
     }
@@ -279,17 +377,30 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             g.setColor(GUIConstants.controlPanelDotColor);
             
             g.fillOval((int)dot[0] - GUIConstants.controlPanelDotRadius/2, (int)dot[1] - GUIConstants.controlPanelDotRadius/2, GUIConstants.controlPanelDotRadius, GUIConstants.controlPanelDotRadius);
+
+            dot = path.getPosition(point.endDistance).point;
+            dot[0] *= GUIConstants.pixels_per_meter;
+            dot[1] *= GUIConstants.pixels_per_meter;
+            g.setColor(GUIConstants.controlPanelDotColor);
+            
+            g.fillOval((int)dot[0] - GUIConstants.controlPanelDotRadius/2, (int)dot[1] - GUIConstants.controlPanelDotRadius/2, GUIConstants.controlPanelDotRadius, GUIConstants.controlPanelDotRadius);
  
         }
     }
     public void updateShape(MouseEvent e){
-        if(e.getButton() == MouseEvent.BUTTON3){
-            mode = "stop";
-            lines.remove(lines.size()-1);
-        }
         mousePos[0] = e.getX();
         mousePos[1] = e.getY();
-        if(mode.equals("start")){
+        if(e.getButton() == MouseEvent.BUTTON3){
+            if(mode.equals("second endpoint"))
+            lines.remove(lines.size()-1);
+            mode = "stop";
+            
+        }
+        else if(e.getButton() == MouseEvent.BUTTON2){
+            mode = "edit";
+        }
+        
+       else  if(mode.equals("start")){
             dots.add(mousePos.clone());
             mode = "first endpoint";
             int[][] line = {mousePos.clone(), mousePos};
@@ -316,8 +427,10 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             mode = "distance";
             distances.add(Double.valueOf(0));
             System.out.println("second endpoint");
+            addedDotAfterSecondEndpoint = false;
         }
         else if(mode.equals("distance")){
+            dots.remove(dots.size()-1);
             double[][] p = new double[points.size()][2];
             
             double[] distanceArr = new double[distances.size()];
@@ -353,6 +466,12 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
            
             lines.add(line2);
             mode = "second endpoint";
+        }
+        else if(mode.equals("edit")){
+            mode = "edit drag";
+        }
+        else if(mode.equals("edit drag")){
+            mode = "edit";
         }
 
     }

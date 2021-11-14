@@ -10,7 +10,8 @@ public class GUIConstants {
 
     //General Constants
     public static final double pixels_per_meter = 616/8.23;
-
+    public static Color highlightColor = new Color(0,0,0);
+    public static int highlightRadius = 80;
     //trajectory Panel
     public static int trajectoryPlanningWidth = 500;
     public static int trajectoryPlanningHeight = 500;
@@ -29,6 +30,7 @@ public class GUIConstants {
     //velocity Panel
     public static final Color velocityDotsColor = new Color(255,0,255);
 
+    public static Color velocityTextColor = new Color(255,255,255);
 
     public static int velocityPlanningWidth = 500;
     public static int velocityPlanningHeight = 250;
@@ -81,6 +83,12 @@ public class GUIConstants {
     public static Color controlPanelBackground = new Color(200,200,200);
 
     public static Color controlPanelDotColor = new Color(137, 207, 240);
+    public static Color velocityHighlightColor = new Color(255, 255, 255);
+
+
+
+
+   
 
     public static final int controlPanelAxisOffset = 50;
 }

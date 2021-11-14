@@ -111,7 +111,7 @@ public class SubsystemControlPanel extends JFrame implements ActionListener{
         }
         if(e.getSource() == setDegrees){
             panel.mode = "first point";
-            panel.setPoints.add(new SCSetPoint(0, 0, "navx"));
+            panel.setPoints.add(new SCSetPoint(0, panel.trajectory.panel.path.totalDistance, "navx"));
             try{
                 double angle = Double.parseDouble(navxDegreeInput.getText());
                 panel.setPoints.get(panel.setPoints.size()-1).inputs.add(angle);
@@ -165,17 +165,33 @@ class SCPanel extends JPanel implements MouseInputListener, KeyListener{
         for(SCSetPoint point: setPoints){
             g.setColor(GUIConstants.controlPanelDotColor);
             g.fillOval(GUIConstants.controlPanelAxisOffset -  GUIConstants.controlPanelDotRadius/2, (int)yToGY(point.startDistance) -  GUIConstants.controlPanelDotRadius/2, GUIConstants.controlPanelDotRadius, GUIConstants.controlPanelDotRadius);
+            g.fillOval(GUIConstants.controlPanelAxisOffset -  GUIConstants.controlPanelDotRadius/2, (int)yToGY(point.endDistance) -  GUIConstants.controlPanelDotRadius/2, GUIConstants.controlPanelDotRadius, GUIConstants.controlPanelDotRadius);
+       
         }
       
        updateHover();
     }
 
-    public void updateMode(){}
+    public void updateMode(){
+        if(mode.equals("first point")){
+            setPoints.get(setPoints.size()-1).startDistance = gyToY(mousePos[1]);
+            mode = "second point";
+        }
+        else if(mode.equals("second point")){
+            mode = "null";
+        }
+    }
     public void updateHover(){
         if(mode.equals("null")) return;
         if(mode.equals("first point")){
             if(gyToY(mousePos[1])>0 && gyToY(mousePos[1])<trajectory.panel.path.totalDistance)
                 setPoints.get(setPoints.size()-1).startDistance = gyToY(mousePos[1]);
+
+        }
+        else if(mode.equals("second point")){
+            if(gyToY(mousePos[1])>setPoints.get(setPoints.size()-1).startDistance && gyToY(mousePos[1])<trajectory.panel.path.totalDistance)
+                setPoints.get(setPoints.size()-1).endDistance = gyToY(mousePos[1]);
+
         }
     }
     public double yToGY(double y){
@@ -196,7 +212,7 @@ class SCPanel extends JPanel implements MouseInputListener, KeyListener{
         // TODO Auto-generated method stub
         mousePos[0] = e.getX();
         mousePos[1] = e.getY();
-        
+        updateMode();
       repaint();
     }
 
