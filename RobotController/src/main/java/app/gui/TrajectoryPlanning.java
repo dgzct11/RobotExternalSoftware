@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.io.FileWriter;
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.awt.Image;
 import javax.swing.JFrame;
@@ -38,6 +40,9 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     JMenuItem editVelocity = new JMenuItem("Edit Velocity");
     Velocity velocity;
     SubsystemControlPanel controlPanel;
+    public static String currentPath = Paths.get("").toAbsolutePath().toString();
+    public static String fs = File.separator;
+
     public void setVelocity(Velocity velocityPlanning){
         velocity = velocityPlanning;
     }
@@ -49,7 +54,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         frame.setTitle("Trajectory Planning");
        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        panel = new Panel("./RobotController\\resources\\deepSpace.jpeg", velocity, controlPanel);
+        panel = new Panel(currentPath + fs + "resources" + fs + "deepSpace.jpeg", velocity, controlPanel);
         frame.add(panel);
 
         
@@ -106,7 +111,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     }
     public void saveSubsystems(){
         try{
-            FileWriter subsystemWriter = new FileWriter("./RobotController\\memory\\subsystem.txt");
+            FileWriter subsystemWriter = new FileWriter(currentPath + fs + "memory" + fs + "subsystem.txt");
             String text = "";
            for(SCSetPoint point:controlPanel.panel.setPoints )
                 text += point.toString();
@@ -120,7 +125,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     }
     public void saveV(){
         try{
-            FileWriter velocityWriter = new FileWriter("./RobotController\\memory\\velocity.txt");
+            FileWriter velocityWriter = new FileWriter(currentPath + fs + "memory" + fs + "velocity.txt");
             String text = "";
            for(double[] point: panel.velocity.panel.kinematics.velocities)
                text += String.format("%f,%f\n", point[0], point[1]);
@@ -136,14 +141,14 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
 
     public void savePath(){    
         try{
-            FileWriter pointsWriter = new FileWriter("./RobotController\\memory\\points.txt");
+            FileWriter pointsWriter = new FileWriter(currentPath + fs + "memory" + fs + "points.txt");
             String pointsText = "";
            for(double[] point: panel.path.points)
                pointsText += String.format("%f,%f\n", point[0], point[1]);
             pointsWriter.write(pointsText);
             pointsWriter.close();
 
-            FileWriter distancesWriter = new FileWriter("./RobotController\\memory\\distances.txt");
+            FileWriter distancesWriter = new FileWriter(currentPath + fs + "memory" + fs + "distances.txt");
             String distanceText = "";
             for(double distance: panel.path.distances)
                distanceText += String.format("%f\n", distance);
