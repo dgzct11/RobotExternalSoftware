@@ -19,7 +19,7 @@ public class Graph extends JPanel {
 
     private int width = 800;
     private int heigth = 400;
-    private int padding = 25;
+    private int padding = 35;
     private int labelPadding = 25;
     private Color lineColor = new Color(44, 102, 230, 180);
     private Color pointColor = new Color(100, 100, 100, 180);

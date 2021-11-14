@@ -126,7 +126,7 @@ public class WindowMan {
             g2.setStroke(new BasicStroke(5,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL));
             int size = Handler.spline.points.size();
-            for (float t = 0.05f; t < (float) size-3; t += 0.05f) {
+            for (float t = 0.05f; t <= (float) size-3; t += 0.01f) {
                 Point ppos = Handler.spline.getPoint(t-0.05f);
                 Point pos = Handler.spline.getPoint(t);
                 g2.drawLine(ppos.x, ppos.y, pos.x, pos.y);
@@ -137,7 +137,7 @@ public class WindowMan {
                 g2.fillOval(Handler.spline.points.get(i).x-4, Handler.spline.points.get(i).y-4, 10, 10);
             }
 
-            Handler.spline.setZero();
+            if(size-4 >= 1){ Handler.spline.setZero();}
         }
 
         @Override
