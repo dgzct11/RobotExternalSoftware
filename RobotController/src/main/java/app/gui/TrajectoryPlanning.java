@@ -118,7 +118,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     }
     public void saveSubsystems(){
         try{
-            FileWriter subsystemWriter = new FileWriter("./" + fs + "memory" + fs + "subsystem.txt");
+            FileWriter subsystemWriter = new FileWriter("./RobotController" + fs + "memory" + fs + "subsystem.txt");
             String text = "";
            for(SCSetPoint point:controlPanel.panel.setPoints )
                 text += point.toString();

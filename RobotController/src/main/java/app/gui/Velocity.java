@@ -285,7 +285,7 @@ public class Velocity extends JFrame{
             if(kinematics.segments.get(i).acceleration > 0)
                 g.drawString(String.format("%f m/s^2", kinematics.segments.get(i).acceleration), xToGX((points.get(i+1)[0]+points.get(i)[0])/2), yToGY((points.get(i+1)[1]+points.get(i)[1])/2)+20);
             else
-            g.drawString(String.format("%f m/s^2", kinematics.segments.get(i).acceleration), xToGX((points.get(i+1)[0]+points.get(i)[0])/2), yToGY((points.get(i+1)[1]+points.get(i)[1])/2)-10);
+            g.drawString(String.format("%f m/s^2", kinematics.segments.get(i).acceleration), xToGX((kinematics.velocities[i+1][0]+kinematics.velocities[i][0])/2), yToGY((kinematics.velocities[i+1][1]+kinematics.velocities[i][1])/2)-10);
         
         }
     }
