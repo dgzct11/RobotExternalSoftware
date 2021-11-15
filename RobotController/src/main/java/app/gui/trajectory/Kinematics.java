@@ -34,10 +34,12 @@ public class Kinematics {
         int index = 0;
         double timeSum = 0;
         double distanceSum = 0;
+        getTotalTime();
         if(time>totalTime) return path.totalDistance;
-        while(segments.get(index).totalTime+timeSum<time){
+        while(segments.get(index).totalTime + timeSum<time){
             timeSum += segments.get(index).totalTime;
             distanceSum += segments.get(index).distance;
+            index ++;
         }
         return segments.get(index).getDistance(time-timeSum)+distanceSum;
     }

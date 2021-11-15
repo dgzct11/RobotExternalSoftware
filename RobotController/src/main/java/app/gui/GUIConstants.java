@@ -9,7 +9,7 @@ import java.awt.BasicStroke;
 public class GUIConstants {
 
     //General Constants
-    public static final double pixels_per_meter = 616/8.23;
+    public static final double pixels_per_meter = 986/13.5;
     public static Color highlightColor = new Color(0,0,0);
     public static int highlightRadius = 80;
 

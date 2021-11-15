@@ -16,6 +16,7 @@ public class KinematicSegment{
         end = e;
         // vf^2 = v0^2 + 2a(x)
         // vf = v0 + at
+        // distance, velocity
         distance = e[0] - s[0];
         acceleration = ( e[1]*e[1] - s[1]*s[1] )/(2*distance);
         totalTime = (e[1] - s[1])/acceleration;

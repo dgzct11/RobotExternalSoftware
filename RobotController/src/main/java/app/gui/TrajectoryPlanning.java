@@ -55,7 +55,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         frame.setTitle("Trajectory Planning");
        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        panel = new Panel("./RobotController" + fs + "resources" + fs + "deepSpace.jpeg", velocity, controlPanel);
+        panel = new Panel("./RobotController" + fs + "resources" + fs + "Commons_drawing.png", velocity, controlPanel);
         frame.add(panel);
 
         
@@ -151,7 +151,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
             FileWriter pointsWriter = new FileWriter("./RobotController" + fs + "memory" + fs + "points.txt");
             String pointsText = "";
            for(double[] point: panel.path.points)
-               pointsText += String.format("%f,%f\n", point[0], point[1]);
+               pointsText += String.format("%f,%f\n", point[1], point[0]);
             pointsWriter.write(pointsText);
             pointsWriter.close();
 
