@@ -30,6 +30,7 @@ import app.gui.trajectory.Segment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Graphics2D;
+
 public class Velocity extends JFrame{
     JFrame frame;
     VPanel panel;
@@ -45,8 +46,9 @@ public class Velocity extends JFrame{
 
         panel = new VPanel(trajectory);
         frame.add(panel);
-            
+
         frame.setSize(panel.getPreferredSize());
+        frame.pack();
         frame.setLocation(GUIConstants.velocityPlanningX, GUIConstants.velocityPlanningY);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);

@@ -70,6 +70,7 @@ public class SubsystemControlPanel extends JFrame implements ActionListener{
         panel.setBounds(0, 0, (int)size.getWidth(), (int)size.getHeight());
         buttonPanel.setBounds((int)size.getWidth()+100, 0, (int)buttonSize.getWidth(), (int)buttonSize.getHeight());
         frame.setSize((int)size.getWidth() + (int)buttonSize.getWidth(), (int)size.getHeight());
+        frame.pack();
         frame.setLocation(GUIConstants.controlPanelX, GUIConstants.controlPanelY);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
