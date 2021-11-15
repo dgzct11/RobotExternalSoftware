@@ -38,6 +38,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     JMenuItem saveSubsytem = new JMenuItem("Save Subsystem Plan");
     JMenuItem editPath = new JMenuItem("Edit Path");
     JMenuItem editVelocity = new JMenuItem("Edit Velocity");
+    JMenuItem displayTimeRuler = new JMenuItem("Display Time Ruler");
     Velocity velocity;
     SubsystemControlPanel controlPanel;
     public static String currentPath = Paths.get("").toAbsolutePath().toString();
@@ -54,7 +55,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         frame.setTitle("Trajectory Planning");
        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        panel = new Panel(currentPath + fs + "resources" + fs + "deepSpace.jpeg", velocity, controlPanel);
+        panel = new Panel("./RobotController" + fs + "resources" + fs + "deepSpace.jpeg", velocity, controlPanel);
         frame.add(panel);
 
         
@@ -72,6 +73,9 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         menuActions.add(saveSubsytem);
         menuActions.add(editPath);
         menuActions.add(editVelocity);
+        menuActions.add(displayTimeRuler);
+
+        displayTimeRuler.addActionListener(this);
         editVelocity.addActionListener(this);
         editPath.addActionListener(this);
         savePathToFile.addActionListener(this);
@@ -107,11 +111,14 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         else if(e.getSource().equals(saveSubsytem)){
             saveSubsystems();
         }
+        else if(e.getSource().equals(displayTimeRuler)){
+            panel.displayTimeRuler = !panel.displayTimeRuler;
+        }
         System.out.println("menu clicked");
     }
     public void saveSubsystems(){
         try{
-            FileWriter subsystemWriter = new FileWriter(currentPath + fs + "memory" + fs + "subsystem.txt");
+            FileWriter subsystemWriter = new FileWriter("./" + fs + "memory" + fs + "subsystem.txt");
             String text = "";
            for(SCSetPoint point:controlPanel.panel.setPoints )
                 text += point.toString();
@@ -125,7 +132,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     }
     public void saveV(){
         try{
-            FileWriter velocityWriter = new FileWriter(currentPath + fs + "memory" + fs + "velocity.txt");
+            FileWriter velocityWriter = new FileWriter("./RobotController" + fs + "memory" + fs + "velocity.txt");
             String text = "";
            for(double[] point: panel.velocity.panel.kinematics.velocities)
                text += String.format("%f,%f\n", point[0], point[1]);
@@ -141,14 +148,14 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
 
     public void savePath(){    
         try{
-            FileWriter pointsWriter = new FileWriter(currentPath + fs + "memory" + fs + "points.txt");
+            FileWriter pointsWriter = new FileWriter("./RobotController" + fs + "memory" + fs + "points.txt");
             String pointsText = "";
            for(double[] point: panel.path.points)
                pointsText += String.format("%f,%f\n", point[0], point[1]);
             pointsWriter.write(pointsText);
             pointsWriter.close();
 
-            FileWriter distancesWriter = new FileWriter(currentPath + fs + "memory" + fs + "distances.txt");
+            FileWriter distancesWriter = new FileWriter("./RobotController" + fs + "memory" + fs + "distances.txt");
             String distanceText = "";
             for(double distance: panel.path.distances)
                distanceText += String.format("%f\n", distance);
@@ -183,6 +190,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     public ArrayList<double[]> points = new ArrayList<double[]>();
     public Path path;
 
+    public boolean displayTimeRuler = false;
     public boolean addedDotAfterSecondEndpoint = false;
     public Panel(String path, Velocity velocityPlanning, SubsystemControlPanel control) {
         velocity = velocityPlanning;
@@ -219,6 +227,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         if(path != null)
             displayVelocityPoints(g);
             displayControlPanelPoints(g);
+            drawTimeRuler(g);
     }
     public int getHeight(){
         return fieldImage.getHeight(null);
@@ -496,6 +505,25 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             mode = "edit";
         }
 
+    }
+
+    public void drawTimeRuler(Graphics g){
+        if(displayTimeRuler && velocity.panel.kinematics != null){
+            g.setColor(GUIConstants.timeRulerColor);
+            for(int i = 0; i<velocity.panel.kinematics.totalTime ; i++){
+                double[] p1 = path.getPosition(velocity.panel.kinematics.getDistance(i)).point;
+                int[] point = {(int)(p1[0]*GUIConstants.pixels_per_meter), (int)(p1[1] * GUIConstants.pixels_per_meter)};
+                if(i % 5 == 0){
+                    g.fillOval((int)point[0] - GUIConstants.FiveSecondDotRadius/2, (int)point[1] - GUIConstants.FiveSecondDotRadius/2, GUIConstants.FiveSecondDotRadius, GUIConstants.FiveSecondDotRadius);
+ 
+                }
+                else{
+                    g.fillOval((int)point[0] - GUIConstants.OneSecondDotRadius/2, (int)point[1] - GUIConstants.OneSecondDotRadius/2, GUIConstants.OneSecondDotRadius, GUIConstants.OneSecondDotRadius);
+ 
+                }
+            }
+           
+        }
     }
 
     public void drawPathPortion(double startDistance, double endDistance){
