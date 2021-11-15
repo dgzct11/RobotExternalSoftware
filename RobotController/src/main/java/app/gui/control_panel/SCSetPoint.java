@@ -18,6 +18,6 @@ public class SCSetPoint {
         String inputString = "";
         for(Double input: inputs)
             inputString += input + ",";
-        return String.format("%f,%f:%s\n", startDistance, endDistance, inputString);
+        return String.format("%s:%f,%f:%s\n",subsystemIdentifier, startDistance, endDistance, inputString);
     }
 }

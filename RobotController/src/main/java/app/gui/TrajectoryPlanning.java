@@ -493,6 +493,9 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
 
     }
 
+    public void drawPathPortion(double startDistance, double endDistance){
+
+    }
     @Override
     public void keyTyped(KeyEvent e) {
         // TODO Auto-generated method stub
