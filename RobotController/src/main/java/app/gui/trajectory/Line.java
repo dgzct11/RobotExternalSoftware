@@ -10,6 +10,23 @@ public class Line extends Segment{
     public double slope;
    
    
+    public Line(double[] start, double[] end){
+        startPoint = start;
+        endPoint = end;
+        slope = (start[1] - end[1]) / (start[0]-end[0]);
+        length = M.distance(start, end);
+
+    }
+    public Line(int[] start, int[] end){
+        super();
+        startPoint[0] = start[0];
+        startPoint[1] = start[1];
+        endPoint[0] = end[0];
+        endPoint[1] = end[1];
+        slope = (start[1] - end[1]) / ((double)(start[0]-end[0]));
+        length = M.distance(start, end);
+
+    }
     public Line(double[] start, int[] end){
         startPoint[0] = start[0];
         startPoint[1] = start[1];
