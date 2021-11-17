@@ -244,15 +244,15 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     @Override
     public void mouseClicked(MouseEvent e) {
         // TODO Auto-generated method stub
-     
+      updateShape(e);
+      repaint();
         
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         // TODO Auto-generated method stub
-        updateShape(e);
-        repaint();
+        
     }
 
     @Override
