@@ -56,6 +56,12 @@ public class M {
       result[i] = arr[i] * GUIConstants.pixels_per_meter;
     return result;
   }
+  public static int[] metersToPixelsInt(double[] arr){
+    int[] result = new int[arr.length];
+    for(int i = 0; i<arr.length; i++)
+      result[i] = (int)(arr[i] * GUIConstants.pixels_per_meter);
+    return result;
+  }
   public static double[] intArrToDouble(int[] arr){
     double[] result = new double[arr.length];
     for(int i = 0; i<arr.length; i++){

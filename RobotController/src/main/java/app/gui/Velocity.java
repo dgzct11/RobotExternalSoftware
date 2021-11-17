@@ -296,16 +296,16 @@ public class Velocity extends JFrame{
     @Override
     public void mouseClicked(MouseEvent e) {
         // TODO Auto-generated method stub
-        mousePos[0] = e.getX();
-        mousePos[1] = e.getY();
-        updateMode(e);
+       
     }
 
 
     @Override
     public void mousePressed(MouseEvent e) {
         // TODO Auto-generated method stub
-        
+        mousePos[0] = e.getX();
+        mousePos[1] = e.getY();
+        updateMode(e);
     }
 
 

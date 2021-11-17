@@ -39,6 +39,8 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
     JMenuItem editPath = new JMenuItem("Edit Path");
     JMenuItem editVelocity = new JMenuItem("Edit Velocity");
     JMenuItem displayTimeRuler = new JMenuItem("Display Time Ruler");
+    JMenuItem simulateRobotPath = new JMenuItem("Simulate Path");
+
     Velocity velocity;
     SubsystemControlPanel controlPanel;
     public static String currentPath = Paths.get("").toAbsolutePath().toString();
@@ -74,7 +76,8 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         menuActions.add(editPath);
         menuActions.add(editVelocity);
         menuActions.add(displayTimeRuler);
-
+        menuActions.add(simulateRobotPath);
+        simulateRobotPath.addActionListener(this);
         displayTimeRuler.addActionListener(this);
         editVelocity.addActionListener(this);
         editPath.addActionListener(this);
@@ -87,6 +90,8 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         menuBar.setVisible(true);
        
         frame.pack();
+        panel.setFocusable(true);
+     
         frame.setLocation(GUIConstants.trajectoryPlanningX, GUIConstants.trajectoryPlanningY);
         frame.setVisible(true);
         GUIConstants.trajectoryPlanningWidth = frame.getWidth();
@@ -113,6 +118,10 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         }
         else if(e.getSource().equals(displayTimeRuler)){
             panel.displayTimeRuler = !panel.displayTimeRuler;
+        }
+        else if(e.getSource().equals(simulateRobotPath)){
+            panel.shouldDrawRobot = true;
+            panel.initialTime = System.currentTimeMillis()/1000.;
         }
         System.out.println("menu clicked");
     }
@@ -190,14 +199,19 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     public ArrayList<double[]> points = new ArrayList<double[]>();
     public Path path;
 
+
+    public double initialTime;
     public boolean displayTimeRuler = false;
     public boolean addedDotAfterSecondEndpoint = false;
+    public boolean shouldDrawRobot = false;
+    public double[] robotPos = new double[2];
     public Panel(String path, Velocity velocityPlanning, SubsystemControlPanel control) {
         velocity = velocityPlanning;
         fieldImage = Toolkit.getDefaultToolkit().getImage(path);
         controlPanel = control;
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
+        setFocusable(true);
         mode = "start";
     }
 
@@ -224,10 +238,13 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         }
       
         velocity.panel.repaint();
-        if(path != null)
+        if(path != null){
             displayVelocityPoints(g);
             displayControlPanelPoints(g);
             drawTimeRuler(g);
+        }
+        if(shouldDrawRobot)
+            drawRobot(g);
     }
     public int getHeight(){
         return fieldImage.getHeight(null);
@@ -244,15 +261,15 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     @Override
     public void mouseClicked(MouseEvent e) {
         // TODO Auto-generated method stub
-      updateShape(e);
-      repaint();
-        
+     
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         // TODO Auto-generated method stub
-        
+        updateShape(e);
+        repaint();
+        requestFocusInWindow();
     }
 
     @Override
@@ -288,9 +305,45 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
        repaint();
     }
 
+    public void updateRobotPosition(){
+        if(velocity.panel.kinematics != null){
+            double time = 0;
+            time = System.currentTimeMillis()/1000 - initialTime;
+            if(time < velocity.panel.kinematics.totalTime){
+                shouldDrawRobot = true;
+                
+                robotPos = path.getPosition(velocity.panel.kinematics.getDistance(time)).point;
+                
+            }
+            else {
+                shouldDrawRobot = false;
+            }
+        }
+        
+    }
+    public void drawRobot(Graphics g){
+        updateRobotPosition();
+        int[] pos = M.metersToPixelsInt(robotPos);
+        g.setColor(GUIConstants.robotColor);
+        g.fillRect(pos[0] - (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter/2), pos[1] - (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter/2), (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter), (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter));
+    }
     public void updateHover(Graphics g){
         if(mode == "stop"){
 
+        }
+        else if(mode.equals("edit distance")){
+            int[][] l = lines.get(lines.size()-2);
+            Line line = new Line(l[0],l[1]); 
+            Line mouseLine = new Line(mousePos, -1/((double)((line.endPoint[1]-line.startPoint[1])/(line.endPoint[0] - line.startPoint[0]))));
+            double[] intersection = line.getIntersection(mouseLine);
+            int[] dot = {(int)intersection[0], (int)intersection[1]};
+            if(addedDotAfterSecondEndpoint)
+                dots.set(dots.size()-1, dot);
+            else{
+                dots.add(dot);
+                addedDotAfterSecondEndpoint = true;
+            }
+            distances.set(distances.size()-1, M.distance(dot, l[1]));
         }
         else if(mode.equals("edit drag")){
             int index = 0;
@@ -305,11 +358,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             point[0] = mousePos[0];
             point[1] = mousePos[1];
             points.set(index, point);
-            try{
-                dots.set(index, M.doubleArrToInt(point));
-            } catch(IndexOutOfBoundsException e){
-                dots.add(index, M.doubleArrToInt(point));
-            }
+           
             double[][] p = new double[points.size()][2];
             
             double[] distanceArr = new double[distances.size()];
@@ -328,7 +377,8 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         
             lines.clear();
             arcs.clear();
-            
+            dots.clear();
+
            
             for(Segment segment: path.segments){
               
@@ -339,7 +389,11 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
                 else if(segment instanceof Circle){
                     arcs.add(((Circle)segment).toGUI());
                 }
-                
+                dots.add(M.metersToPixelsInt(segment.startPoint));
+              dots.add(M.metersToPixelsInt(segment.endPoint));
+            }
+            for(double[] pForLoop: points){
+                dots.add(M.doubleArrToInt(pForLoop));
             }
             
            
@@ -480,12 +534,14 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             double[] arc = path.segments.get(path.segments.size()-2).toGUI();
             arcs.add(arc);
             mode = "second endpoint";
-           
+            
           for(int i = 0; i<path.segments.size(); i+=2){
               Segment segment = path.segments.get(i);
               int[][] line = {{(int)(segment.startPoint[0]*GUIConstants.pixels_per_meter), (int)(segment.startPoint[1]*GUIConstants.pixels_per_meter)},
               {(int)(segment.endPoint[0]*GUIConstants.pixels_per_meter), (int)(segment.endPoint[1]*GUIConstants.pixels_per_meter)}};
               lines.set(i/2, line);
+              dots.add(M.metersToPixelsInt(segment.startPoint));
+              dots.add(M.metersToPixelsInt(segment.endPoint));
           }
         
           int[][] line2 = {lines.get(lines.size()-1)[1], mousePos};
@@ -532,12 +588,16 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     @Override
     public void keyTyped(KeyEvent e) {
         // TODO Auto-generated method stub
-        
+      
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         // TODO Auto-generated method stub
+        if(mode.equals("edit") && e.getKeyCode() == KeyEvent.VK_D){
+            mode = "edit distance";
+        }
+        System.out.println("key typed");
         
     }
 

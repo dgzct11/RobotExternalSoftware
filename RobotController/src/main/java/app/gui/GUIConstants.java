@@ -17,6 +17,9 @@ public class GUIConstants {
     public static int FiveSecondDotRadius = 20;
     public static int OneSecondDotRadius = 15;
     public static int halfSecondDotRadius = 10;
+
+    public static Color robotColor = new Color(200,0,0);
+    public static double robotWidth = 0.727;
     //trajectory Panel
     public static int trajectoryPlanningWidth = 500;
     public static int trajectoryPlanningHeight = 500;
@@ -89,6 +92,7 @@ public class GUIConstants {
 
     public static Color controlPanelDotColor = new Color(137, 207, 240);
     public static Color velocityHighlightColor = new Color(255, 255, 255);
+
 
 
 
