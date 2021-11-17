@@ -213,6 +213,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         this.addMouseMotionListener(this);
         setFocusable(true);
         mode = "start";
+        
     }
 
     @Override
@@ -241,8 +242,11 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         if(path != null){
             displayVelocityPoints(g);
             displayControlPanelPoints(g);
+            
             drawTimeRuler(g);
         }
+        
+       
         if(shouldDrawRobot)
             drawRobot(g);
     }
@@ -269,6 +273,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         // TODO Auto-generated method stub
         updateShape(e);
         repaint();
+        velocity.panel.updateFinalDistance();
         requestFocusInWindow();
     }
 
@@ -325,7 +330,10 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         updateRobotPosition();
         int[] pos = M.metersToPixelsInt(robotPos);
         g.setColor(GUIConstants.robotColor);
+        
         g.fillRect(pos[0] - (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter/2), pos[1] - (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter/2), (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter), (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter));
+     
+        repaint(pos[0] - (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter/2), pos[1] - (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter/2), (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter), (int)(GUIConstants.robotWidth*GUIConstants.pixels_per_meter));
     }
     public void updateHover(Graphics g){
         if(mode == "stop"){
@@ -469,7 +477,8 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             g.setColor(GUIConstants.controlPanelDotColor);
             
             g.fillOval((int)dot[0] - GUIConstants.controlPanelDotRadius/2, (int)dot[1] - GUIConstants.controlPanelDotRadius/2, GUIConstants.controlPanelDotRadius, GUIConstants.controlPanelDotRadius);
- 
+            
+            drawPathPortion(point.startDistance, point.endDistance, point.color, g);
         }
     }
     public void updateShape(MouseEvent e){
@@ -582,7 +591,50 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         }
     }
 
-    public void drawPathPortion(double startDistance, double endDistance){
+    public void drawPathPortion(double startDistance, double endDistance, Color color, Graphics g){
+        double[] startPoint = path.getPosition(startDistance).point;
+        double[] endPoint = path.getPosition(endDistance).point;
+        int startIndex = path.getIndex(startDistance);
+        int endIndex = path.getIndex(endDistance);
+        g.setColor(color);
+        if(startIndex == endIndex){
+            if(path.segments.get(startIndex) instanceof Line){
+                g.drawLine((int)(startPoint[0] * GUIConstants.pixels_per_meter), (int)(startPoint[1] * GUIConstants.pixels_per_meter), (int)(endPoint[0]*GUIConstants.pixels_per_meter), (int)(endPoint[1]*GUIConstants.pixels_per_meter));
+       
+            }
+            else{
+                Circle circle = (Circle)path.segments.get(startIndex);
+
+                Circle newCircle = new Circle(circle.center, circle.radius, startPoint, endPoint);
+                double[] arc = newCircle.toGUI();
+                g.drawArc((int)arc[0], (int)arc[1], (int)arc[2], (int)arc[3], (int)arc[4], (int)arc[5]);
+        
+            }
+        }
+        for(int i = startIndex; i<=endIndex; i++){
+            double[] start = path.segments.get(i).startPoint;
+            double[] end = path.segments.get(i).endPoint;
+            if(i == startIndex){
+                start = startPoint;
+            }
+            else if(i == endIndex){
+                end = endPoint;
+            }
+            if(path.segments.get(startIndex) instanceof Circle){
+                Circle circle = (Circle)path.segments.get(startIndex);
+
+                Circle newCircle = new Circle(circle.center, circle.radius, start, end);
+                double[] arc = newCircle.toGUI();
+                g.drawArc((int)arc[0], (int)arc[1], (int)arc[2], (int)arc[3], (int)arc[4], (int)arc[5]);
+            }
+            else{
+               
+
+                g.drawLine((int)(start[0] * GUIConstants.pixels_per_meter), (int)(start[1] * GUIConstants.pixels_per_meter), (int)(end[0]*GUIConstants.pixels_per_meter), (int)(end[1]*GUIConstants.pixels_per_meter));
+       
+        
+            }
+        }
 
     }
     @Override

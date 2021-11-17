@@ -19,6 +19,8 @@ public class Circle extends Segment {
         endPoint = _endPoint;
         length = M.getArcLength(this);
     }
+  
+  
     public Circle(double[] _center, double _radius, double[] _startPoint){
         center = _center;
         radius = _radius;

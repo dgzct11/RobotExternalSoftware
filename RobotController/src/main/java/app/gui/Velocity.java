@@ -163,6 +163,11 @@ public class Velocity extends JFrame{
     }
     public void updateFinalDistance(){
         points.get(points.size()-1)[0] = trajectory.panel.path.totalDistance;
+        double[][] v = new double[points.size()][2];
+        for(int i = 0; i<v.length; i++){
+            v[i] = points.get(i);
+        }
+        kinematics = new Kinematics(trajectory.panel.path, v);
     }
 
     public void sortPoints(){
@@ -229,7 +234,8 @@ public class Velocity extends JFrame{
             }
             double[] point = {gxToX(mousePos[0]), gyToY(mousePos[1])};
             points.set(index,point);
-           
+            currentIndex = index;
+            sortPoints();
             g.drawString(String.format("%f m/s", gyToY(mousePos[1])), 10 + mousePos[0], mousePos[1]);
             double[][] v = new double[points.size()][2];
             for(int i = 0; i<v.length; i++){

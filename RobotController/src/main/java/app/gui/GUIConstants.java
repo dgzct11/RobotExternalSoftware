@@ -33,6 +33,7 @@ public class GUIConstants {
     public static Color lineColor = new Color(48, 213, 200);
     public static BasicStroke lineStroke = new BasicStroke(5);
 
+    public static Color navXColor = new Color(255,0,0);
    
 
     //velocity Panel
@@ -92,6 +93,7 @@ public class GUIConstants {
 
     public static Color controlPanelDotColor = new Color(137, 207, 240);
     public static Color velocityHighlightColor = new Color(255, 255, 255);
+
 
 
 

@@ -80,6 +80,20 @@ public class Path {
         return segments.get(currentIndex).angle;
     }
     
+    public int getIndex(double distance){
+        if(distance>totalDistance){
+          
+            return  segments.size()-1;
+        }
+        double currentDistance = 0;
+        int index = 0;
+        while(index<segments.size()-1 && currentDistance +segments.get(index).length <= distance){
+            currentDistance += segments.get(index).length;   
+            index ++;
+        }
+      
+        return index;
+    }
     public Position getEndPoint(){
         Segment seg = segments.get(segments.size()-1);
             return new Position(seg.endPoint, M.angleFromSlope(seg.startPoint, seg.endPoint));
