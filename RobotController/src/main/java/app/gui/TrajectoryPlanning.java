@@ -313,7 +313,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     public void updateRobotPosition(){
         if(velocity.panel.kinematics != null){
             double time = 0;
-            time = System.currentTimeMillis()/1000 - initialTime;
+            time = System.currentTimeMillis()/1000. - initialTime;
             if(time < velocity.panel.kinematics.totalTime){
                 shouldDrawRobot = true;
                 
@@ -620,8 +620,8 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             else if(i == endIndex){
                 end = endPoint;
             }
-            if(path.segments.get(startIndex) instanceof Circle){
-                Circle circle = (Circle)path.segments.get(startIndex);
+            if(path.segments.get(i) instanceof Circle){
+                Circle circle = (Circle)path.segments.get(i);
 
                 Circle newCircle = new Circle(circle.center, circle.radius, start, end);
                 double[] arc = newCircle.toGUI();
