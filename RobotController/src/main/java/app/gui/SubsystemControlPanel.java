@@ -211,17 +211,17 @@ class SCPanel extends JPanel implements MouseInputListener, KeyListener{
     @Override
     public void mouseClicked(MouseEvent e) {
         // TODO Auto-generated method stub
-        mousePos[0] = e.getX();
-        mousePos[1] = e.getY();
-        updateMode();
-      repaint();
+      
     }
 
 
     @Override
     public void mousePressed(MouseEvent e) {
         // TODO Auto-generated method stub
-        
+        mousePos[0] = e.getX();
+        mousePos[1] = e.getY();
+        updateMode();
+      repaint();
     }
 
 

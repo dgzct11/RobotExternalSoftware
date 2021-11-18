@@ -20,6 +20,10 @@ public class GUIConstants {
 
     public static Color robotColor = new Color(200,0,0);
     public static double robotWidth = 0.727;
+
+    public static Stroke controlPanelSegmentStroke = new BasicStroke(8);
+    
+    public static Color navXColor = new Color(255,0,0);
     //trajectory Panel
     public static int trajectoryPlanningWidth = 500;
     public static int trajectoryPlanningHeight = 500;
@@ -33,7 +37,6 @@ public class GUIConstants {
     public static Color lineColor = new Color(48, 213, 200);
     public static BasicStroke lineStroke = new BasicStroke(5);
 
-    public static Color navXColor = new Color(255,0,0);
    
 
     //velocity Panel
@@ -93,6 +96,7 @@ public class GUIConstants {
 
     public static Color controlPanelDotColor = new Color(137, 207, 240);
     public static Color velocityHighlightColor = new Color(255, 255, 255);
+
 
 
 

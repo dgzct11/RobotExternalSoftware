@@ -461,7 +461,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
            
         }
     }
-    public void displayControlPanelPoints(Graphics g){
+    public void displayControlPanelPoints(Graphics2D g){
         
         for(SCSetPoint point:  controlPanel.panel.setPoints){
             double[] dot = path.getPosition(point.startDistance).point;
@@ -591,12 +591,13 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         }
     }
 
-    public void drawPathPortion(double startDistance, double endDistance, Color color, Graphics g){
+    public void drawPathPortion(double startDistance, double endDistance, Color color, Graphics2D g){
         double[] startPoint = path.getPosition(startDistance).point;
         double[] endPoint = path.getPosition(endDistance).point;
         int startIndex = path.getIndex(startDistance);
         int endIndex = path.getIndex(endDistance);
         g.setColor(color);
+        g.setStroke(GUIConstants.controlPanelSegmentStroke);
         if(startIndex == endIndex){
             if(path.segments.get(startIndex) instanceof Line){
                 g.drawLine((int)(startPoint[0] * GUIConstants.pixels_per_meter), (int)(startPoint[1] * GUIConstants.pixels_per_meter), (int)(endPoint[0]*GUIConstants.pixels_per_meter), (int)(endPoint[1]*GUIConstants.pixels_per_meter));
@@ -610,6 +611,8 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
                 g.drawArc((int)arc[0], (int)arc[1], (int)arc[2], (int)arc[3], (int)arc[4], (int)arc[5]);
         
             }
+            return;
+            
         }
         for(int i = startIndex; i<=endIndex; i++){
             double[] start = path.segments.get(i).startPoint;
