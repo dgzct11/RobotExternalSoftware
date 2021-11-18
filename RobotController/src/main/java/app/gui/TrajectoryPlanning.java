@@ -59,8 +59,11 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         panel = new Panel("./RobotController" + fs + "resources" + fs + "Commons_drawing.png", velocity, controlPanel);
         frame.add(panel);
-
-        
+        panel.setFocusable(true);
+        frame.setFocusable(true);
+     
+        frame.requestFocusInWindow();
+        panel.requestFocusInWindow();
         System.out.printf("position: %d %d", panel.getWidth(), panel.getHeight());
         System.out.println(panel.getPreferredSize());
        
@@ -90,8 +93,7 @@ public class TrajectoryPlanning extends JFrame implements ActionListener{
         menuBar.setVisible(true);
        
         frame.pack();
-        panel.setFocusable(true);
-     
+      
         frame.setLocation(GUIConstants.trajectoryPlanningX, GUIConstants.trajectoryPlanningY);
         frame.setVisible(true);
         GUIConstants.trajectoryPlanningWidth = frame.getWidth();
@@ -210,6 +212,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         fieldImage = Toolkit.getDefaultToolkit().getImage(path);
         controlPanel = control;
         this.addMouseListener(this);
+        this.addKeyListener(this);
         this.addMouseMotionListener(this);
         setFocusable(true);
         mode = "start";
@@ -306,7 +309,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         // TODO Auto-generated method stub
         mousePos[0] = e.getX();
         mousePos[1] = e.getY();
-      
+        requestFocusInWindow();
        repaint();
     }
 
@@ -340,6 +343,34 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
 
         }
         else if(mode.equals("edit distance")){
+            int index = 0;
+            double minDistance = M.distance(path.points[0], mousePos);
+            for(int i = 0; i<path.points.length; i++){
+                if(M.distance(M.metersToPixels(path.points[i]), mousePos) < minDistance){
+                    index = i;
+                    minDistance =  M.distance(M.metersToPixels(path.points[i]), mousePos);
+                }
+            }
+            double[] point = path.points[index];
+            
+          
+            g.setColor(GUIConstants.highlightColor);
+            g.fillOval((int)(point[0]  *GUIConstants.pixels_per_meter)-GUIConstants.highlightRadius/2, (int)(point[1]  *GUIConstants.pixels_per_meter) - GUIConstants.highlightRadius/2, GUIConstants.highlightRadius, GUIConstants.highlightRadius);
+         
+            g.setColor(GUIConstants.dotColor);
+            g.fillOval((int)(point[0]  *GUIConstants.pixels_per_meter)-GUIConstants.dotRadius/2, (int)(point[1]  *GUIConstants.pixels_per_meter) - GUIConstants.dotRadius/2, GUIConstants.dotRadius, GUIConstants.dotRadius);
+     
+        }
+        else if(mode.equals("edit distance drag")){
+
+            int index = 0;
+            double minDistance = M.distance(M.metersToPixels(path.points[0]), mousePos);
+            for(int i = 0; i<path.points.length; i++){
+                if(M.distance(M.metersToPixels(path.points[i]), mousePos) < minDistance){
+                    index = i;
+                    minDistance =  M.distance(M.metersToPixels(path.points[i]), mousePos);
+                }
+            }
             int[][] l = lines.get(lines.size()-2);
             Line line = new Line(l[0],l[1]); 
             Line mouseLine = new Line(mousePos, -1/((double)((line.endPoint[1]-line.startPoint[1])/(line.endPoint[0] - line.startPoint[0]))));
@@ -410,7 +441,7 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
            
         }
         
-        
+     
         else if(mode.equals("edit")){
             int index = 0;
             double minDistance = M.distance(path.points[0], mousePos);
@@ -643,13 +674,16 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
     @Override
     public void keyTyped(KeyEvent e) {
         // TODO Auto-generated method stub
-      
+        if(mode.equals("edit") && e.getKeyCode() == KeyEvent.VK_D){
+            mode = "edit distance";
+        }
+        System.out.println("key typed");
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         // TODO Auto-generated method stub
-        if(mode.equals("edit") && e.getKeyCode() == KeyEvent.VK_D){
+        if(e.getKeyCode() == KeyEvent.VK_D){
             mode = "edit distance";
         }
         System.out.println("key typed");

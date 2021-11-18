@@ -162,6 +162,7 @@ public class Velocity extends JFrame{
         repaint();
     }
     public void updateFinalDistance(){
+        if(trajectory.panel.path == null) return;
         points.get(points.size()-1)[0] = trajectory.panel.path.totalDistance;
         double[][] v = new double[points.size()][2];
         for(int i = 0; i<v.length; i++){
