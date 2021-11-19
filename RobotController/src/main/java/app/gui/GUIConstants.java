@@ -21,9 +21,11 @@ public class GUIConstants {
     public static Color robotColor = new Color(200,0,0);
     public static double robotWidth = 0.727;
 
-    public static Stroke controlPanelSegmentStroke = new BasicStroke(8);
+    public static Stroke controlPanelSegmentStroke = new BasicStroke(8, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
     
     public static Color navXColor = new Color(255,0,0);
+
+    public static Stroke arrowStroke = new BasicStroke(8);
     //trajectory Panel
     public static int trajectoryPlanningWidth = 500;
     public static int trajectoryPlanningHeight = 500;

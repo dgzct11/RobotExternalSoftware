@@ -15,10 +15,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.event.MouseInputListener;
 
+import javax.swing.event.MouseInputListener;
+import java.awt.geom.Path2D;
+import java.awt.geom.AffineTransform;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
 
 import app.gui.control_panel.SCSetPoint;
 import app.gui.trajectory.Circle;
@@ -363,26 +366,24 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         }
         else if(mode.equals("edit distance drag")){
 
-            int index = 0;
-            double minDistance = M.distance(M.metersToPixels(path.points[0]), mousePos);
-            for(int i = 0; i<path.points.length; i++){
+            int index = 1;
+            double minDistance = M.distance(M.metersToPixels(path.points[1]), mousePos);
+            for(int i = 1; i<path.points.length-1; i++){
                 if(M.distance(M.metersToPixels(path.points[i]), mousePos) < minDistance){
                     index = i;
                     minDistance =  M.distance(M.metersToPixels(path.points[i]), mousePos);
                 }
             }
-            int[][] l = lines.get(lines.size()-2);
+            int[][] l = lines.get(index-1);
             Line line = new Line(l[0],l[1]); 
             Line mouseLine = new Line(mousePos, -1/((double)((line.endPoint[1]-line.startPoint[1])/(line.endPoint[0] - line.startPoint[0]))));
             double[] intersection = line.getIntersection(mouseLine);
-            int[] dot = {(int)intersection[0], (int)intersection[1]};
-            if(addedDotAfterSecondEndpoint)
-                dots.set(dots.size()-1, dot);
-            else{
-                dots.add(dot);
-                addedDotAfterSecondEndpoint = true;
-            }
-            distances.set(distances.size()-1, M.distance(dot, l[1]));
+            System.out.println(intersection[0] + " " + intersection[1]);
+            System.out.println(l[1][0] + " " + l[1][1]);
+            System.out.println("index: " + index );
+            distances.set(index-1, M.distance(intersection, points.get(index)));
+            System.out.println(distances.get(index-1));
+            updatePath();
         }
         else if(mode.equals("edit drag")){
             int index = 0;
@@ -510,7 +511,68 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
             g.fillOval((int)dot[0] - GUIConstants.controlPanelDotRadius/2, (int)dot[1] - GUIConstants.controlPanelDotRadius/2, GUIConstants.controlPanelDotRadius, GUIConstants.controlPanelDotRadius);
             
             drawPathPortion(point.startDistance, point.endDistance, point.color, g);
+
+            if(point.subsystemIdentifier.equals("navx")){
+                double[] pos = path.getPosition((point.startDistance + point.endDistance)/2).point;
+                pos[0] *= GUIConstants.pixels_per_meter;
+                pos[1] *= GUIConstants.pixels_per_meter;
+                drawArrow(g, pos[0], pos[1], point.inputs.get(0));
+            }
         }
+    }
+    public void drawArrow(Graphics2D g, double x, double y, double angle){
+        Arrow arrow = new Arrow();
+        
+    AffineTransform oldXForm = g.getTransform();    
+        angle = -angle;
+        AffineTransform at = new AffineTransform();
+        at.translate(2*(x), 2*(y- arrow.getBounds().getHeight()/4));
+        at.rotate(Math.toRadians(angle), 0, arrow.getBounds().getHeight()/2);
+        g.setTransform(at);
+        
+        g.setStroke(GUIConstants.arrowStroke);
+        g.draw(arrow);
+        g.setTransform(oldXForm);
+       
+    }
+    public void updatePath(){
+        double[][] p = new double[points.size()][2];
+            
+            double[] distanceArr = new double[distances.size()];
+            double[] angles = new double[distances.size()+1];
+            for(int i = 0; i<distanceArr.length; i++){
+                distanceArr[i] = distances.get(i)/GUIConstants.pixels_per_meter; 
+            }
+            for(int i = 0; i<points.size(); i++){
+                p[i][0] = points.get(i)[0]/GUIConstants.pixels_per_meter;
+                p[i][1] = points.get(i)[1]/GUIConstants.pixels_per_meter;
+                
+            }
+            
+            path = new Path(p, distanceArr,angles );
+
+        
+            lines.clear();
+            arcs.clear();
+            dots.clear();
+
+           
+            for(Segment segment: path.segments){
+              
+                if(segment instanceof Line){
+                    int[][] line = {M.doubleArrToInt(M.metersToPixels( segment.startPoint)),M.doubleArrToInt(M.metersToPixels(segment.endPoint))};
+                    lines.add(line);
+                }
+                else if(segment instanceof Circle){
+                    arcs.add(((Circle)segment).toGUI());
+                }
+                dots.add(M.metersToPixelsInt(segment.startPoint));
+              dots.add(M.metersToPixelsInt(segment.endPoint));
+            }
+            for(double[] pForLoop: points){
+                dots.add(M.doubleArrToInt(pForLoop));
+            }
+            
     }
     public void updateShape(MouseEvent e){
         mousePos[0] = e.getX();
@@ -600,6 +662,10 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         else if(mode.equals("edit drag")){
             mode = "edit";
         }
+        else if(mode.equals("edit distance")){
+            mode = "edit distance drag";
+        }
+        
 
     }
 
@@ -695,4 +761,24 @@ class Panel extends JPanel implements MouseInputListener, KeyListener{
         // TODO Auto-generated method stub
         
     }
+}
+
+
+
+class Arrow extends Path2D.Double {
+
+    public Arrow() {
+        double arrow_breadth = 36;
+        double length = 100;
+        double arrow_length = 40;
+        moveTo(0, arrow_breadth/2);
+        lineTo(length, arrow_breadth/2);
+        
+        moveTo(length - arrow_length, 0);
+        lineTo(length, arrow_breadth/2);
+        moveTo(length - arrow_length, arrow_breadth);
+        lineTo(length, arrow_breadth/2);
+        
+    }
+
 }
