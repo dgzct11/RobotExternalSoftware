@@ -197,7 +197,7 @@ public class Velocity extends JFrame{
         }
         else if(mode.equals("point velocity")){
             points.get(currentIndex)[1] = gyToY(mousePos[1]);
-            g.drawString(String.format("%f m/s", gyToY(mousePos[1])), mousePos[0], mousePos[1]);
+            
             double[][] v = new double[points.size()][2];
             for(int i = 0; i<v.length; i++){
                 v[i] = points.get(i);
@@ -238,7 +238,7 @@ public class Velocity extends JFrame{
             points.set(index,point);
             currentIndex = index;
             sortPoints();
-            g.drawString(String.format("%f m/s", gyToY(mousePos[1])), 10 + mousePos[0], mousePos[1]);
+           
             double[][] v = new double[points.size()][2];
             for(int i = 0; i<v.length; i++){
                 v[i] = points.get(i);
@@ -293,8 +293,14 @@ public class Velocity extends JFrame{
             if(kinematics.segments.get(i).acceleration > 0)
                 g.drawString(String.format("%f m/s^2", kinematics.segments.get(i).acceleration), xToGX((points.get(i+1)[0]+points.get(i)[0])/2), yToGY((points.get(i+1)[1]+points.get(i)[1])/2)+20);
             else
-            g.drawString(String.format("%f m/s^2", kinematics.segments.get(i).acceleration), xToGX((kinematics.velocities[i+1][0]+kinematics.velocities[i][0])/2), yToGY((kinematics.velocities[i+1][1]+kinematics.velocities[i][1])/2)-10);
-        
+                g.drawString(String.format("%f m/s^2", kinematics.segments.get(i).acceleration), xToGX((kinematics.velocities[i+1][0]+kinematics.velocities[i][0])/2), yToGY((kinematics.velocities[i+1][1]+kinematics.velocities[i][1])/2)-10);
+            if(i<kinematics.segments.size()-1){
+                int x = xToGX(kinematics.segments.get(i).end[0]) + 10;
+                int y = yToGY(kinematics.segments.get(i).end[1]);
+                if(kinematics.segments.get(i+1).acceleration > 0) y += 15;
+                else y -= 6;
+                g.drawString(String.format("%f m/s", kinematics.segments.get(i).end[1]), x, y);
+            }
         }
     }
     @Override
