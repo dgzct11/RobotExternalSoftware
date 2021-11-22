@@ -5,3 +5,6 @@ Undo Button
 Add text fields to edit distances and poitns
 
 Add current Index for editing
+
+
+Add bounds for robot collision

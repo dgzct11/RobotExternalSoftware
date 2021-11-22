@@ -19,7 +19,7 @@ public class GUIConstants {
     public static int halfSecondDotRadius = 10;
 
     public static Color robotColor = new Color(200,0,0);
-    public static double robotWidth = 0.727;
+    public static double robotWidth = 0.8763;
 
     public static Stroke controlPanelSegmentStroke = new BasicStroke(8, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
     
