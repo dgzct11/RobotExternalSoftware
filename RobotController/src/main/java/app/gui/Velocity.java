@@ -188,7 +188,7 @@ public class Velocity extends JFrame{
                 break;
             }
         }
-    }
+    }//asdfhas;lkdjfh
     public void updateHover(Graphics g){
         if(mode.equals("point distance")){
             double[] point = {gxToX(mousePos[0]), 0};
