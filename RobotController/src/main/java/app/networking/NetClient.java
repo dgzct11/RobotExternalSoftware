@@ -8,9 +8,9 @@ public class NetClient {
   public double x = 0; 
   public double y = 0;
   NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        NetworkTable table = inst.getTable("datatable");
-        NetworkTableEntry xEntry = table.getEntry("x");
-        NetworkTableEntry yEntry = table.getEntry("y");
+        NetworkTable table = inst.getTable("SmartDashboard");
+        NetworkTableEntry xEntry = table.getEntry("Od x");
+        NetworkTableEntry yEntry = table.getEntry("Od y");
     public void run(){
         
         inst.startClientTeam(5057);  // where TEAM=190, 294, etc, or use inst.startClient("hostname") or similar
