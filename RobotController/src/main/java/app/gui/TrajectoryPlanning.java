@@ -120,7 +120,7 @@ class Panel extends JPanel{
 
    
     public void drawRobot(Graphics g){
-       System.out.println("drawing");
+     
         int[] pos = M.metersToPixelsInt(net.getPose());
         
         g.setColor(GUIConstants.robotColor);
