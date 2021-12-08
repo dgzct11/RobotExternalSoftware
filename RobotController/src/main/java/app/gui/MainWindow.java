@@ -13,23 +13,20 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import app.networking.NetClient;
+
 
 public class MainWindow {
-     SubsystemControlPanel controlPanel;
+     
      TrajectoryPlanning trajectoryPlanning;
-    Velocity velocity;
+ 
     public void display() {
-        trajectoryPlanning = new TrajectoryPlanning();
-        controlPanel = new SubsystemControlPanel();
-        velocity = new Velocity();
-       
-        trajectoryPlanning.setVelocity(velocity);
-        trajectoryPlanning.setControlPanel(controlPanel);
-        velocity.setTrajectory(trajectoryPlanning);
-        controlPanel.setTrajectory(trajectoryPlanning);
+        NetClient net = new NetClient();
+        net.run();
+        trajectoryPlanning = new TrajectoryPlanning(net);
+     
         
         trajectoryPlanning.display();
-        velocity.display();
-        controlPanel.display();
+       
     }
 }

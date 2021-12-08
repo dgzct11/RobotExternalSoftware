@@ -5,23 +5,22 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class NetClient {
-    public void run(){
-        NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  public double x = 0; 
+  public double y = 0;
+  NetworkTableInstance inst = NetworkTableInstance.getDefault();
         NetworkTable table = inst.getTable("datatable");
         NetworkTableEntry xEntry = table.getEntry("x");
         NetworkTableEntry yEntry = table.getEntry("y");
+    public void run(){
+        
         inst.startClientTeam(5057);  // where TEAM=190, 294, etc, or use inst.startClient("hostname") or similar
         inst.startDSClient();
-        while (true) {
-            try {
-              Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-              System.out.println("interrupted");
-              return;
-            }
-            double x = xEntry.getDouble(0.0);
-            double y = yEntry.getDouble(0.0);
-            System.out.println("X: " + x + " Y: " + y);
-          }
+       
+    }
+    public double[] getPose(){
+      x = xEntry.getDouble(0.0);
+      y = yEntry.getDouble(0.0);
+     double[] result = {x,y};
+     return result;
     }
 }
